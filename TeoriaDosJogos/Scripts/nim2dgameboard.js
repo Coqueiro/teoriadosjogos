@@ -133,6 +133,9 @@ function getSelectedCheckers() {
 }
 
 function deleteCheckers(line, row, line2, row2) {
+
+    var markedCheckers = [];
+
     if (line <= checkerBoard.length
         && line2 < checkerBoard.length) {
         var underChecker, overChecker;
@@ -147,8 +150,11 @@ function deleteCheckers(line, row, line2, row2) {
 
             while (underChecker <= overChecker) {
                 if (!checkerBoard[line][underChecker].destroyed) {
-                    checkerBoard[line][underChecker].trigger("Delete");
+                    markedCheckers.push(checkerBoard[line][underChecker]);
                     board[line]--;
+                } else {
+                    markedCheckers = [];
+                    break;
                 }
 
                 underChecker++;
@@ -164,17 +170,23 @@ function deleteCheckers(line, row, line2, row2) {
 
             while (underChecker <= overChecker) {
                 if (!checkerBoard[underChecker][row].destroyed) {
-                    checkerBoard[underChecker][row].trigger("Delete")
+                    markedCheckers.push(checkerBoard[underChecker][row]);
                     board[underChecker]--;
+                } else {
+                    markedCheckers = [];
+                    break;
                 }
 
                 underChecker++;
             }
-        } else {
-            Crafty.trigger("Unselect");
         }
+
+        Crafty.trigger("Unselect");
     }
 
-    console.log(board);
+    for (var i = 0; i < markedCheckers.length; i++)
+    {
+        markedCheckers[i].trigger("Delete");
+    }
 }
     
