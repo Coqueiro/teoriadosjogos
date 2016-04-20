@@ -55,7 +55,6 @@ function boardGenerator(lines, rows) {
 }
 
 function domineeringBoardRender() {
-    var lines = board.length;
     var y = startY + contourLength;
     var lines = 0;
     var rows;

@@ -22,5 +22,10 @@ namespace TeoriaDosJogos.Controllers
         {
             return View();
         }
+
+        public ActionResult Othello()
+        {
+            return View();
+        }
     }
 }

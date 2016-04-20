@@ -232,6 +232,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\domineeringgameboard.js" />
+    <Content Include="Scripts\othellogameboard.js" />
     <Content Include="Scripts\nimgameboard.js" />
     <Content Include="Scripts\nim2dgameboard.js" />
     <Content Include="Scripts\jsprolog.js" />
@@ -276,6 +277,7 @@
     <Content Include="Views\Game\Nim2D.cshtml" />
     <Content Include="Views\Game\Nim.cshtml" />
     <Content Include="Views\Game\Domineering.cshtml" />
+    <Content Include="Views\Game\Othello.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
