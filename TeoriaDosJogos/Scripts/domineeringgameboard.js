@@ -3,13 +3,14 @@ var board = [];
 var playerSwitch = true;
 var playerNorth = true;
 var startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
+var level = parseInt(getParameterByName("level")) || 0;
 startMenu();
 
 function startMenu() {
     var dimensionX = 500;
     var dimensionY = 500;
-    var lines = 8;
-    var rows = 8;
+    var lines = parseInt(getParameterByName("lines")) || 8;
+    var rows = parseInt(getParameterByName("rows")) || 8;
     boardGenerator(lines, rows);
     Crafty.init(dimensionX, dimensionY, document.getElementById('gameboard'));
     renderStartMenu();

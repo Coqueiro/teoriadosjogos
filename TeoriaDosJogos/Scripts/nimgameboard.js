@@ -2,14 +2,16 @@
 var board = [];
 var playerSwitch = true;
 var varianceX = 40, varianceY = 120, startX = 10, startY = 10, w = 20, h = 100;
+var level = parseInt(getParameterByName("level")) || 0;
+var miserie = (getParameterByName("miserie") === "true") || false;
 startMenu();
 
 function startMenu() {
     var dimensionX = 500;
     var dimensionY = 500;
-    var lines = 3;
-    var firstLine = 3;
-    var increaseByLine = 2;
+    var lines = parseInt(getParameterByName("lines")) || 3;
+    var firstLine = parseInt(getParameterByName("firstLine")) || 3;
+    var increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
     boardGenerator(firstLine, lines, increaseByLine);
     Crafty.init(dimensionX, dimensionY, document.getElementById('gameboard'));
     renderStartMenu();

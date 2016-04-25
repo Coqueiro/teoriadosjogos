@@ -3,12 +3,13 @@ var pieces = [];
 var board = [];
 var playerBlack = true;
 var startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
-var lines = 8;
-var rows = 8;
 var insideLimit = 5;
-startMenu();
 var blackColor = "blue";
 var whiteColor = "yellow";
+var lines = parseInt(getParameterByName("lines")) || 8;
+var rows = parseInt(getParameterByName("rows")) || 8;
+var level = parseInt(getParameterByName("level")) || 0;
+startMenu();
 
 function startMenu() {
     var dimensionX = 500;
