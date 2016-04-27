@@ -27,5 +27,10 @@ namespace TeoriaDosJogos.Controllers
         {
             return View();
         }
+
+        public ActionResult GameSelector()
+        {
+            return View();
+        }
     }
 }

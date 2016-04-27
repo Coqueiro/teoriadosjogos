@@ -1,25 +1,28 @@
-﻿var othelloBoard = [];
-var pieces = [];
-var board = [];
-var playerBlack = true;
-var startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
-var insideLimit = 5;
-var blackColor = "blue";
-var whiteColor = "yellow";
-var lines = parseInt(getParameterByName("lines")) || 8;
-var rows = parseInt(getParameterByName("rows")) || 8;
-var level = parseInt(getParameterByName("level")) || 0;
-startMenu();
+﻿function setupOthello()
+{
+    window.othelloBoard = [];
+    window.pieces = [];
+    window.board = [];
+    window.playerBlack = true;
+    window.startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
+    window.insideLimit = 5;
+    window.blackColor = "blue";
+    window.whiteColor = "yellow";
+    window.lines = parseInt(getParameterByName("lines")) || 8;
+    window.rows = parseInt(getParameterByName("rows")) || 8;
+    window.level = parseInt(getParameterByName("level")) || 0;
+    startMenuOthello();
+}
 
-function startMenu() {
+function startMenuOthello() {
     var dimensionX = 500;
     var dimensionY = 500;
     boardGenerator(lines, rows);
     Crafty.init(dimensionX, dimensionY, document.getElementById('gameboard'));
-    renderStartMenu();
+    renderOthelloStartMenu();
 }
 
-function renderStartMenu() {
+function renderOthelloStartMenu() {
     Crafty.e("2D, Canvas, Color")
     .attr({ x: startX, y: startY, w: board[0] * (w + contourLength) + contourLength, h: board.length * (h + contourLength) + contourLength })
     .color("white")
@@ -34,7 +37,7 @@ function renderStartMenu() {
     Crafty.e("2D, Canvas, Color, Mouse")
     .attr({ x: 200, y: 220, w: 70, h: 30 })
     .color("orange")
-    .bind("MouseUp", function () { initGame() })
+    .bind("MouseUp", function () { initGameOthello() })
     .bind("MouseOver", function () { this.color("red") })
     .bind("MouseOut", function () { this.color("orange") })
     .bind("DestroyMenu", function () { this.destroy() });
@@ -46,7 +49,7 @@ function renderStartMenu() {
     .bind("DestroyMenu", function () { this.destroy() });
 }
 
-function initGame() {
+function initGameOthello() {
     Crafty.trigger("DestroyMenu");
     othelloBoardRender();
 }

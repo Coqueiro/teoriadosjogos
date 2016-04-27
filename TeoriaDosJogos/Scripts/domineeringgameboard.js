@@ -1,22 +1,24 @@
-﻿var domineeringBoard = [];
-var board = [];
-var playerSwitch = true;
-var playerNorth = true;
-var startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
-var level = parseInt(getParameterByName("level")) || 0;
-startMenu();
+﻿function setupDomineering() {
+    window.domineeringBoard = [];
+    window.board = [];
+    window.playerSwitch = true;
+    window.playerNorth = true;
+    window.startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
+    window.level = parseInt(getParameterByName("level")) || 0;
+    startMenuDomineering();
+}
 
-function startMenu() {
+function startMenuDomineering() {
     var dimensionX = 500;
     var dimensionY = 500;
     var lines = parseInt(getParameterByName("lines")) || 8;
     var rows = parseInt(getParameterByName("rows")) || 8;
-    boardGenerator(lines, rows);
+    domineeringBoardGenerator(lines, rows);
     Crafty.init(dimensionX, dimensionY, document.getElementById('gameboard'));
-    renderStartMenu();
+    renderDomineeringStartMenu();
 }
 
-function renderStartMenu() {
+function renderDomineeringStartMenu() {
     Crafty.e("2D, Canvas, Color")
     .attr({ x: startX, y: startY, w: board[0] * (w + contourLength) + contourLength, h: board.length * (h + contourLength) + contourLength })
     .color("white")
@@ -31,7 +33,7 @@ function renderStartMenu() {
     Crafty.e("2D, Canvas, Color, Mouse")
     .attr({ x: 200, y: 220, w: 70, h: 30 })
     .color("orange")
-    .bind("MouseUp", function () { initGame() })
+    .bind("MouseUp", function () { initDomineeringGame() })
     .bind("MouseOver", function () { this.color("red") })
     .bind("MouseOut", function () { this.color("orange") })
     .bind("DestroyMenu", function () { this.destroy() });
@@ -43,12 +45,12 @@ function renderStartMenu() {
     .bind("DestroyMenu", function () { this.destroy() });
 }
 
-function initGame() {
+function initDomineeringGame() {
     Crafty.trigger("DestroyMenu");
     domineeringBoardRender();
 }
 
-function boardGenerator(lines, rows) {
+function domineeringBoardGenerator(lines, rows) {
     while (lines > 0) {
         board.push(rows);
         lines--;

@@ -1,24 +1,25 @@
-﻿var checkerBoard = [];
-var board = [];
-var playerSwitch = true;
-var varianceX = 60, varianceY = 60, startX = 10, startY = 10, w = 40, h = 40;
-var level = parseInt(getParameterByName("level")) || 0;
-var miserie = (getParameterByName("miserie") === "true") || false;
-var lines = parseInt(getParameterByName("lines")) || 3;
-var firstLine = parseInt(getParameterByName("firstLine")) || 3;
-var increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
-
-startMenu();
-
-function startMenu() {
-    var dimensionX = 500;
-    var dimensionY = 500;
-    boardGenerator(lines, firstLine, increaseByLine);
-    Crafty.init(dimensionX, dimensionY, document.getElementById('gameboard'));
-    renderStartMenu();
+﻿function setupNim2D() {
+    window.checkerBoard = [];
+    window.board = [];
+    window.playerSwitch = true;
+    window.varianceX = 60, varianceY = 60, startX = 10, startY = 10, w = 40, h = 40;
+    window.level = parseInt(getParameterByName("level")) || 0;
+    window.miserie = (getParameterByName("miserie") === "true") || false;
+    window.lines = parseInt(getParameterByName("lines")) || 3;
+    window.firstLine = parseInt(getParameterByName("firstLine")) || 3;
+    window.increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
+    startMenuNim2D();
 }
 
-function renderStartMenu() {
+function startMenuNim2D() {
+    var dimensionX = 500;
+    var dimensionY = 500;
+    nim2DBoardGenerator(lines, firstLine, increaseByLine);
+    Crafty.init(dimensionX, dimensionY, document.getElementById('gameboard'));
+    renderNim2DStartMenu();
+}
+
+function renderNim2DStartMenu() {
     Crafty.e("2D, Canvas, Color")
     .attr({ x: startX, y: startY, w: board[0] * w, h: board.length * h })
     .color("white")
@@ -33,7 +34,7 @@ function renderStartMenu() {
     Crafty.e("2D, Canvas, Color, Mouse")
     .attr({ x: 200, y: 220, w: 70, h: 30 })
     .color("orange")
-    .bind("MouseUp", function () { initGame() })
+    .bind("MouseUp", function () { initNim2DGame() })
     .bind("MouseOver", function () { this.color("red") })
     .bind("MouseOut", function () { this.color("orange") })
     .bind("DestroyMenu", function () { this.destroy() });
@@ -45,12 +46,12 @@ function renderStartMenu() {
     .bind("DestroyMenu", function () { this.destroy() });
 }
 
-function initGame() {
+function initNim2DGame() {
     Crafty.trigger("DestroyMenu");
     checkersPositioner();
 }
 
-function boardGenerator(lines, firstLine, factorUp) {
+function nim2DBoardGenerator(lines, firstLine, factorUp) {
     while (lines > 0) {
         board.unshift(firstLine);
         firstLine = firstLine + factorUp;
