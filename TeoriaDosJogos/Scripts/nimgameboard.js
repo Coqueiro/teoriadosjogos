@@ -4,15 +4,15 @@ var playerSwitch = true;
 var varianceX = 40, varianceY = 120, startX = 10, startY = 10, w = 20, h = 100;
 var level = parseInt(getParameterByName("level")) || 0;
 var miserie = (getParameterByName("miserie") === "true") || false;
+var lines = parseInt(getParameterByName("lines")) || 3;
+var firstLine = parseInt(getParameterByName("firstLine")) || 3;
+var increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
 startMenu();
 
 function startMenu() {
     var dimensionX = 500;
     var dimensionY = 500;
-    var lines = parseInt(getParameterByName("lines")) || 3;
-    var firstLine = parseInt(getParameterByName("firstLine")) || 3;
-    var increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
-    boardGenerator(firstLine, lines, increaseByLine);
+    boardGenerator(lines, firstLine, increaseByLine);
     Crafty.init(dimensionX, dimensionY, document.getElementById('gameboard'));
     renderStartMenu();
 }
@@ -52,7 +52,7 @@ function initGame() {
 function boardGenerator(lines, firstLine, factorUp) {
     while (lines > 0) {
         board.unshift(firstLine);
-        firstLine = firstLine + 2;
+        firstLine = firstLine + factorUp;
         lines--;
     }
 }
