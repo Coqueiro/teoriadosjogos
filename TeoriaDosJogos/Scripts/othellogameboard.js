@@ -8,18 +8,18 @@
     window.insideLimit = 5;
     window.blackColor = "blue";
     window.whiteColor = "yellow";
-    window.lines = parseInt(getParameterByName("lines")) || 8;
-    window.rows = parseInt(getParameterByName("rows")) || 8;
-    window.level = parseInt(getParameterByName("level")) || 0;
+    if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 0;
+    if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 3;
+    if (typeof rows == "undefined") window.rows = parseInt(getParameterByName("rows")) || 8;
     startMenuOthello();
 }
 
 function startMenuOthello() {
     var dimensionX = 500;
     var dimensionY = 500;
-    boardGenerator(lines, rows);
     Crafty.init(dimensionX, dimensionY, document.getElementById('gameboard'));
     renderOthelloStartMenu();
+    renderOthelloSelectors();
 }
 
 function renderOthelloStartMenu() {
@@ -49,12 +49,26 @@ function renderOthelloStartMenu() {
     .bind("DestroyMenu", function () { this.destroy() });
 }
 
+function renderOthelloSelectors() {
+    var selectorX = 50;
+    var selectorY = 50;
+    var height = 35;
+
+    createArraySelector("Dificuldade", "level", [0, 1, 2], 1, selectorX, selectorY);
+    selectorY = selectorY + height;
+    createArraySelector("Linhas", "lines", [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
+    selectorY = selectorY + height;
+    createArraySelector("Colunas", "rows", [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
+}
+
 function initGameOthello() {
     Crafty.trigger("DestroyMenu");
+    Crafty.trigger("DestroySelector");
+    othelloBoardGenerator(lines, rows);
     othelloBoardRender();
 }
 
-function boardGenerator(lines, rows) {
+function othelloBoardGenerator(lines, rows) {
     while (lines > 0) {
         board.push(rows);
         lines--;

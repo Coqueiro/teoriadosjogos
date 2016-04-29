@@ -4,18 +4,18 @@
     window.playerSwitch = true;
     window.playerNorth = true;
     window.startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
-    window.level = parseInt(getParameterByName("level")) || 0;
+    if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 0;
+    if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 3;
+    if (typeof rows == "undefined") window.rows = parseInt(getParameterByName("rows")) || 8;
     startMenuDomineering();
 }
 
 function startMenuDomineering() {
     var dimensionX = 500;
     var dimensionY = 500;
-    var lines = parseInt(getParameterByName("lines")) || 8;
-    var rows = parseInt(getParameterByName("rows")) || 8;
-    domineeringBoardGenerator(lines, rows);
     Crafty.init(dimensionX, dimensionY, document.getElementById('gameboard'));
     renderDomineeringStartMenu();
+    renderDomineeringSelectors();
 }
 
 function renderDomineeringStartMenu() {
@@ -45,8 +45,22 @@ function renderDomineeringStartMenu() {
     .bind("DestroyMenu", function () { this.destroy() });
 }
 
+function renderDomineeringSelectors() {
+    var selectorX = 50;
+    var selectorY = 50;
+    var height = 35;
+
+    createArraySelector("Dificuldade", "level", [0, 1, 2], 1, selectorX, selectorY);
+    selectorY = selectorY + height;
+    createArraySelector("Linhas", "lines", [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
+    selectorY = selectorY + height;
+    createArraySelector("Colunas", "rows", [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
+}
+
 function initDomineeringGame() {
     Crafty.trigger("DestroyMenu");
+    Crafty.trigger("DestroySelector");
+    domineeringBoardGenerator(lines, rows);
     domineeringBoardRender();
 }
 

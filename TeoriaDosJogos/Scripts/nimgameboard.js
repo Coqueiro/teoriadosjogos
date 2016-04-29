@@ -3,36 +3,39 @@
     window.board = [];
     window.playerSwitch = true;
     window.varianceX = 40, varianceY = 120, startX = 10, startY = 10, w = 20, h = 100;
-    window.level = parseInt(getParameterByName("level")) || 0;
-    window.miserie = (getParameterByName("miserie") === "true") || false;
-    window.lines = parseInt(getParameterByName("lines")) || 3;
-    window.firstLine = parseInt(getParameterByName("firstLine")) || 3;
-    window.increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
+    if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 0;
+    if (typeof miserie == "undefined") window.miserie = (getParameterByName("miserie") === "true") || false;
+    if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 3;
+    if (typeof firstLine == "undefined") window.firstLine = parseInt(getParameterByName("firstLine")) || 3;
+    if (typeof increaseByLine == "undefined") window.increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
     startMenuNim();
 }
 
 function startMenuNim() {
     var dimensionX = 500;
     var dimensionY = 500;
-    nimBoardGenerator(lines, firstLine, increaseByLine);
     Crafty.init(dimensionX, dimensionY, document.getElementById('gameboard'));
     renderNimStartMenu();
+    renderNimSelectors();
 }
 
 function renderNimStartMenu() {
+    var menuX = 200;
+    var menuY = 250;
+
     Crafty.e("2D, Canvas, Color")
     .attr({ x: startX, y: startY, w: board[0] * w, h: board.length * h })
     .color("white")
     .bind("DestroyMenu", function () { this.destroy() });
 
     Crafty.e("2D, Canvas, Text")
-    .attr({ x: 200, y: 200 })
+    .attr({ x: menuX, y: menuY })
     .text("Nim")
     .textColor("black")
     .bind("DestroyMenu", function () { this.destroy() });
 
     Crafty.e("2D, Canvas, Color, Mouse")
-    .attr({ x: 200, y: 220, w: 70, h: 30 })
+    .attr({ x: menuX, y: menuY + 20, w: 70, h: 30 })
     .color("orange")
     .bind("MouseUp", function () { initNimGame() })
     .bind("MouseOver", function () { this.color("red") })
@@ -40,14 +43,31 @@ function renderNimStartMenu() {
     .bind("DestroyMenu", function () { this.destroy() });
 
     Crafty.e("2D, Canvas, Text")
-    .attr({ x: 210, y: 230 })
+    .attr({ x: menuX + 10, y: menuY + 30 })
     .text("Start game!")
     .textColor("black")
     .bind("DestroyMenu", function () { this.destroy() });
 }
 
+function renderNimSelectors() {
+    var selectorX = 50;
+    var selectorY = 50;
+    var height = 35;
+    createArraySelector("Dificuldade", "level", [0, 1, 2], 1, selectorX, selectorY);
+    selectorY = selectorY + height;
+    createArraySelector("Modo de Jogo", "miserie", ["Normal", "Miséria"], 0, selectorX, selectorY);
+    selectorY = selectorY + height;
+    createArraySelector("Linhas", "lines", [3, 4, 5, 6], 0, selectorX, selectorY);
+    selectorY = selectorY + height;
+    createArraySelector("Primeira Linha", "firstLine", [1, 2, 3, 4, 5], 2, selectorX, selectorY);
+    selectorY = selectorY + height;
+    createArraySelector("Aumento por Linha", "increaseByLine", [1, 2, 3], 1, selectorX, selectorY);
+}
+
 function initNimGame() {
     Crafty.trigger("DestroyMenu");
+    Crafty.trigger("DestroySelector");
+    nimBoardGenerator(lines, firstLine, increaseByLine);
     sticksPositioner();
 }
 
