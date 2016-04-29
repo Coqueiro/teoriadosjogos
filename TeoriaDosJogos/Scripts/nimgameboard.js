@@ -2,7 +2,7 @@
     window.stickBoard = [];
     window.board = [];
     window.playerSwitch = true;
-    window.varianceX = 40, varianceY = 120, startX = 10, startY = 10, w = 20, h = 100;
+    window.varianceX = 40, varianceY = 50, startX = 10, startY = 10, w = 20, h = 40;
     if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 0;
     if (typeof miserie == "undefined") window.miserie = (getParameterByName("miserie") === "true") || "Normal";
     if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 3;
