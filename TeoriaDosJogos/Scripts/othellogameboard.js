@@ -9,7 +9,7 @@
     window.blackColor = "blue";
     window.whiteColor = "yellow";
     if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 0;
-    if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 3;
+    if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 8;
     if (typeof rows == "undefined") window.rows = parseInt(getParameterByName("rows")) || 8;
     startMenuOthello();
 }
