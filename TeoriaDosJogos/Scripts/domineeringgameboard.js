@@ -5,7 +5,7 @@
     window.playerNorth = true;
     window.startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
     if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 0;
-    if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 3;
+    if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 8;
     if (typeof rows == "undefined") window.rows = parseInt(getParameterByName("rows")) || 8;
     startMenuDomineering();
 }
