@@ -4,7 +4,7 @@
     window.playerSwitch = true;
     window.varianceX = 40, varianceY = 120, startX = 10, startY = 10, w = 20, h = 100;
     if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 0;
-    if (typeof miserie == "undefined") window.miserie = (getParameterByName("miserie") === "true") || false;
+    if (typeof miserie == "undefined") window.miserie = (getParameterByName("miserie") === "true") || "Normal";
     if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 3;
     if (typeof firstLine == "undefined") window.firstLine = parseInt(getParameterByName("firstLine")) || 3;
     if (typeof increaseByLine == "undefined") window.increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
