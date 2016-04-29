@@ -95,11 +95,15 @@ function sticksPositioner() {
             stick = Crafty.e("2D, Canvas, Color, Mouse")
             .attr({ x: x, y: y, w: w, h: h })
             .color("black")
-            .bind("Delete", function () { this.destroy() })
+            .bind("Delete", function () {
+                this.destroy();
+                this.destroyed = true;
+            })
             .bind("Click", function () { if(playerSwitch) deleteSticks(this.line, this.row) });
 
             stick["line"] = lines;
             stick["row"] = rows;
+            stick["destroyed"] = false;
 
             stickBoard[stickBoardIndex].push(stick);
             x = x + varianceX;
@@ -123,7 +127,5 @@ function deleteSticks(line, row) {
             }
         }
     }
-
-    console.log(board);
 }
     
