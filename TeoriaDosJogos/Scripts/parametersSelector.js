@@ -1,4 +1,4 @@
-﻿function createArraySelector(selectorName, selectorVariable, selectorArray, defaultPosition, startX, startY) {
+﻿function createArraySelector(selectorName, selectorVariable, spacing, selectorArray, defaultPosition, startX, startY) {
     var size = 30;
     var space = 5;
 
@@ -9,7 +9,7 @@
     .bind("DestroySelector", function () { this.destroy() });
 
     var decreaseButton = Crafty.e("2D, Canvas, Color, Mouse")
-    .attr({ x: startX + text._w + space, y: startY, w: size, h: size })
+    .attr({ x: startX + spacing + space, y: startY, w: size, h: size })
     .color("orange")
     .bind("MouseUp", function () { Crafty.trigger("DecreaseArray", new Array(this.selectorName)) })
     .bind("MouseOver", function () { this.color("red") })
@@ -19,7 +19,7 @@
     decreaseButton["selectorName"] = selectorName;
     
     var increaseButton = Crafty.e("2D, Canvas, Color, Mouse")
-    .attr({ x: startX + text._w + size + 2 * space, y: startY, w: size, h: size })
+    .attr({ x: startX + spacing + size + 2 * space, y: startY, w: size, h: size })
     .color("orange")
     .bind("MouseUp", function () { Crafty.trigger("IncreaseArray", new Array(this.selectorName)) })
     .bind("MouseOver", function () { this.color("red") })
@@ -29,7 +29,7 @@
     increaseButton["selectorName"] = selectorName;
 
     var selectorChoice = Crafty.e("2D, Canvas, Text")
-    .attr({ x: startX + text._w + 2 * size + 3 * space, y: startY + size/3 })
+    .attr({ x: startX + spacing + 2 * size + 3 * space, y: startY + size/3 })
     .text(selectorArray[defaultPosition])
     .textColor("black")
     .bind("DecreaseArray", function (args) {

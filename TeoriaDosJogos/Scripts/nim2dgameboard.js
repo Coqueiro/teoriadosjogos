@@ -53,15 +53,17 @@ function renderNim2DSelectors() {
     var selectorX = 50;
     var selectorY = 50;
     var height = 35;
-    createArraySelector("Dificuldade", "level", [0, 1, 2], 1, selectorX, selectorY);
+    var spacing = 100;
+
+    createArraySelector("Dificuldade", "level", spacing, [0, 1, 2], 1, selectorX, selectorY);
     selectorY = selectorY + height;
-    createArraySelector("Modo de Jogo", "miserie", ["Normal", "Miséria"], 0, selectorX, selectorY);
+    createArraySelector("Modo de Jogo", "miserie", spacing, ["Normal", "Miséria"], 0, selectorX, selectorY);
     selectorY = selectorY + height;
-    createArraySelector("Linhas", "lines", [3, 4, 5, 6], 0, selectorX, selectorY);
+    createArraySelector("Linhas", "lines", spacing, [3, 4, 5, 6], 0, selectorX, selectorY);
     selectorY = selectorY + height;
-    createArraySelector("Primeira Linha", "firstLine", [1, 2, 3, 4, 5], 2, selectorX, selectorY);
+    createArraySelector("Primeira Linha", "firstLine", spacing, [1, 2, 3, 4, 5], 2, selectorX, selectorY);
     selectorY = selectorY + height;
-    createArraySelector("Aumento por Linha", "increaseByLine", [1, 2, 3], 1, selectorX, selectorY);
+    createArraySelector("Aumento por Linha", "increaseByLine", spacing, [1, 2, 3], 1, selectorX, selectorY);
 }
 
 function initNim2DGame() {

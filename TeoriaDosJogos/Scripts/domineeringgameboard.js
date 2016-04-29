@@ -49,12 +49,13 @@ function renderDomineeringSelectors() {
     var selectorX = 50;
     var selectorY = 50;
     var height = 35;
+    var spacing = 100;
 
-    createArraySelector("Dificuldade", "level", [0, 1, 2], 1, selectorX, selectorY);
+    createArraySelector("Dificuldade", "level", spacing, [0, 1, 2], 1, selectorX, selectorY);
     selectorY = selectorY + height;
-    createArraySelector("Linhas", "lines", [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
+    createArraySelector("Linhas", "lines", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
     selectorY = selectorY + height;
-    createArraySelector("Colunas", "rows", [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
+    createArraySelector("Colunas", "rows", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
 }
 
 function initDomineeringGame() {
