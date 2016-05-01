@@ -8,3 +8,20 @@
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
+function sendGameboard(gameboard, game) {
+
+    var setData = {
+        gameboard: gameboard,
+        game: game
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: '/Prolog/GameIntel',
+        data: setData,
+        dataType: "json",
+        xhrFields: {
+            withCredentials: true
+        }
+    });
+}

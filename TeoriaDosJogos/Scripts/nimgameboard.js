@@ -1,7 +1,6 @@
 ﻿function setupNim() {
     window.stickBoard = [];
     window.board = [];
-    window.playerSwitch = true;
     window.varianceX = 40, varianceY = 50, startX = 10, startY = 10, w = 20, h = 40;
     if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 0;
     if (typeof miserie == "undefined") window.miserie = (getParameterByName("miserie") === "true") || "Normal";
@@ -96,10 +95,14 @@ function sticksPositioner() {
             .attr({ x: x, y: y, w: w, h: h })
             .color("black")
             .bind("Delete", function () {
-                this.destroy();
+                this.color("white");
                 this.destroyed = true;
             })
-            .bind("Click", function () { if(playerSwitch) deleteSticks(this.line, this.row) });
+            .bind("Undelete", function () {
+                this.color("black");
+                this.destroyed = false;
+            })
+            .bind("Click", function () { if(playerSwitch && !this.destroyed) deleteSticks(this.line, this.row) });
 
             stick["line"] = lines;
             stick["row"] = rows;
@@ -127,5 +130,26 @@ function deleteSticks(line, row) {
             }
         }
     }
+
+    sendGameboard(getNimBoard(), "Nim");
 }
-    
+
+function getNimBoard() {
+    var simpleNimBoard = [];
+    for (var i = 0; i < stickBoard.length - 1; i++) {
+        simpleNimBoard.push([]);
+        for (var j = 0; j < stickBoard[i].length; j++) {
+            simpleNimBoard[i].push(stickBoard[i][j].destroyed);
+        }
+    }
+    return simpleNimBoard;
+}
+
+function setNimBoard(simpleNimBoard) {
+    for (var i = 0; i < simpleNimBoard.length; i++) {
+        for (var j = 0; j < simpleNimBoard[i].length; j++) {
+            if (simpleNimBoard[i][j] == false) stickBoard[i][j].trigger("Undelete");
+            else if (simpleNimBoard[i][j] == true) stickBoard[i][j].trigger("Delete");
+        }
+    }
+}

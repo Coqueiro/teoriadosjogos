@@ -97,22 +97,34 @@ function othelloBoardRender() {
             .color("white")
             .bind("Delete", function () { this.destroy() })
             .bind("Populate", function () {
-                if (playerBlack) pieces[this.line][this.row].trigger("Populate", new Array(blackColor));
-                else pieces[this.line][this.row].trigger("Populate", new Array(whiteColor));
+                if (playerBlack) {
+                    pieces[this.line][this.row].trigger("Populate", new Array(blackColor));
+                    this.player = blackColor;
+                }
+                else {
+                    pieces[this.line][this.row].trigger("Populate", new Array(whiteColor));
+                    this.player = whiteColor;
+                }
                 this.populated = true;
+            })
+            .bind("PopulateByColor", function (args) {
+                pieces[this.line][this.row].trigger("Populate", new Array(args[0]));
+                this.player = args[0];
             })
             .bind("MouseUp", function () { spacePlacer(this.line, this.row) });
 
             space["line"] = lines;
             space["row"] = rows;
             space["populated"] = false;
+            space["player"] = "";
             
             piece = Crafty.e("2D, Canvas, Color")
             .attr({ x: x + insideLimit, y: y + insideLimit, w: w - 2*insideLimit, h: h - 2*insideLimit })
             .color("white")
             .bind("Delete", function () { this.destroy() })
             .bind("Populate", function (args) {
-                this.color(args[0]);
+                if (args[0] == "") this.color("white");
+                else this.color(args[0]);
                 this["player"] = args[0];
             });
 
@@ -132,9 +144,16 @@ function othelloBoardRender() {
         if (lines == board.length) {
             console.log("hi");
             pieces[Math.round(lines / 2) - 1][Math.round(rows / 2) - 1].trigger("Populate", new Array(whiteColor));
+            othelloBoard[Math.round(lines / 2) - 1][Math.round(rows / 2) - 1].player = whiteColor;
+
             pieces[Math.round(lines / 2)][Math.round(rows / 2)].trigger("Populate", new Array(whiteColor));
+            othelloBoard[Math.round(lines / 2)][Math.round(rows / 2)].player = whiteColor;
+
             pieces[Math.round(lines / 2) - 1][Math.round(rows / 2)].trigger("Populate", new Array(blackColor));
+            othelloBoard[Math.round(lines / 2) - 1][Math.round(rows / 2)].player = blackColor;
+
             pieces[Math.round(lines / 2)][Math.round(rows / 2) - 1].trigger("Populate", new Array(blackColor));
+            othelloBoard[Math.round(lines / 2)][Math.round(rows / 2) - 1].player = blackColor;
         }
     }
 }
@@ -241,6 +260,7 @@ function turnPieces(line1, row1, line2, row2) {
         if (row1 != row2) row1 = nextNumber(row1, row2);
     }
     othelloBoard[line2][row2].trigger("Populate");
+    sendGameboard(getOthelloBoard(), "Othello");
 }
 
 
@@ -248,5 +268,26 @@ function nextNumber(number1, number2) {
     if (number1 < number2) return (number1 + 1);
     else if (number1 > number2) return (number1 - 1);
     else return number1;
+}
+
+function getOthelloBoard() {
+    var simpleOthelloBoard = [];
+    for (var i = 0; i < othelloBoard.length - 1; i++) {
+        simpleOthelloBoard.push([]);
+        for (var j = 0; j < othelloBoard[i].length; j++) {
+            simpleOthelloBoard[i].push(othelloBoard[i][j].player);
+        }
+    }
+    return simpleOthelloBoard;
+}
+
+function setOthelloBoard(simpleOthelloBoard, playerTurn) {
+    for (var i = 0; i < simpleOthelloBoard.length; i++) {
+        for (var j = 0; j < simpleOthelloBoard[i].length; j++) {
+            othelloBoard[i][j].trigger("PopulateByColor", new Array(simpleOthelloBoard[i][j]));
+        }
+    }
+    if (playerTurn == "black") playerBlack = true;
+    else if (playerTurn == "white") playerBlack = false;
 }
 

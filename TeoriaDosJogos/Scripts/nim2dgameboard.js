@@ -1,7 +1,6 @@
 ﻿function setupNim2D() {
     window.checkerBoard = [];
     window.board = [];
-    window.playerSwitch = true;
     window.varianceX = 60, varianceY = 60, startX = 10, startY = 10, w = 40, h = 40;
     if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 0;
     if (typeof miserie == "undefined") window.miserie = (getParameterByName("miserie") === "true") || "Normal";
@@ -98,32 +97,44 @@ function checkersPositioner() {
             .bind("Delete", function () {
                 if (!this.destroyed) {
                     this.selected = false;
-                    this.color("black");
-                    this.destroy();
+                    this.color("white");
                     this.destroyed = true;
-               }
+                }
+            })
+            .bind("Undelete", function() {
+                if (this.destroyed) {
+                    this.selected = false;
+                    this.color("black");
+                    this.destroyed = false;
+                }
             })
             .bind("Select", function () {
-                this.color("red");
-                this.selected = true;
+                if (!this.destroyed) {
+                    this.color("red");
+                    this.selected = true;
+                }
             })
             .bind("Unselect", function () {
-                this.color("black");
-                this.selected = false;
+                if (!this.destroyed) {
+                    this.color("black");
+                    this.selected = false;
+                }
             })
             .bind("MouseUp", function (mouseEvent) {
-                if (mouseEvent.mouseButton === Crafty.mouseButtons.RIGHT) {
-                    this.trigger("Unselect");
-                } else if (this.selected == false) {
-                    this.trigger("Select");
-                    var selectedCheckers = getSelectedCheckers();
-                    if (selectedCheckers.length == 2) {
-                        deleteCheckers(selectedCheckers[0].line, selectedCheckers[0].row, selectedCheckers[1].line, selectedCheckers[1].row);
-                    }
-                } else {
-                    var selectedCheckers = getSelectedCheckers();
-                    if (selectedCheckers.length == 1) {
-                        deleteCheckers(selectedCheckers[0].line, selectedCheckers[0].row, selectedCheckers[0].line, selectedCheckers[0].row);
+                if(!this.destroyed) {
+                    if (mouseEvent.mouseButton === Crafty.mouseButtons.RIGHT) {
+                        this.trigger("Unselect");
+                    } else if (this.selected == false) {
+                        this.trigger("Select");
+                        var selectedCheckers = getSelectedCheckers();
+                        if (selectedCheckers.length == 2) {
+                            deleteCheckers(selectedCheckers[0].line, selectedCheckers[0].row, selectedCheckers[1].line, selectedCheckers[1].row);
+                        }
+                    } else {
+                        var selectedCheckers = getSelectedCheckers();
+                        if (selectedCheckers.length == 1) {
+                            deleteCheckers(selectedCheckers[0].line, selectedCheckers[0].row, selectedCheckers[0].line, selectedCheckers[0].row);
+                        }
                     }
                 }
             });
@@ -213,6 +224,31 @@ function deleteCheckers(line, row, line2, row2) {
     for (var i = 0; i < markedCheckers.length; i++)
     {
         markedCheckers[i].trigger("Delete");
+    }
+
+    if (markedCheckers.length > 0) {
+        sendGameboard(getNim2DBoard(), "Nim2D");
+    }
+}
+
+
+function getNim2DBoard() {
+    var simpleNim2DBoard = [];
+    for (var i = 0; i < checkerBoard.length - 1; i++) {
+        simpleNim2DBoard.push([]);
+        for (var j = 0; j < checkerBoard[i].length; j++) {
+            simpleNim2DBoard[i].push(checkerBoard[i][j].destroyed);
+        }
+    }
+    return simpleNim2DBoard;
+}
+
+function setNim2DBoard(simpleNim2DBoard) {
+    for (var i = 0; i < simpleNim2DBoard.length; i++) {
+        for (var j = 0; j < simpleNim2DBoard[i].length; j++) {
+            if (simpleNim2DBoard[i][j] == false) checkerBoard[i][j].trigger("Undelete");
+            else if (simpleNim2DBoard[i][j] == true) checkerBoard[i][j].trigger("Delete");
+        }
     }
 }
     
