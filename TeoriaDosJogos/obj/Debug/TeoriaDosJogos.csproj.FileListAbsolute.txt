@@ -162,3 +162,5 @@ C:\Users\kartg\OneDrive\Documentos\GitHub\teoriadosjogos\TeoriaDosJogos\bin\Micr
 C:\Users\kartg\OneDrive\Documentos\GitHub\teoriadosjogos\TeoriaDosJogos\obj\Debug\TeoriaDosJogos.csprojResolveAssemblyReference.cache
 C:\Users\kartg\OneDrive\Documentos\GitHub\teoriadosjogos\TeoriaDosJogos\obj\Debug\TeoriaDosJogos.dll
 C:\Users\kartg\OneDrive\Documentos\GitHub\teoriadosjogos\TeoriaDosJogos\obj\Debug\TeoriaDosJogos.pdb
+C:\Users\kartg\OneDrive\Documentos\GitHub\teoriadosjogos\TeoriaDosJogos\bin\SwiPlCs.dll
+C:\Users\kartg\OneDrive\Documentos\GitHub\teoriadosjogos\TeoriaDosJogos\bin\SwiPlCs.xml
