@@ -78,8 +78,8 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="SwiPlCs, Version=1.1.5990.0, Culture=neutral, PublicKeyToken=03ea137181587c56, processorArchitecture=MSIL">
-      <HintPath>..\packages\SWI.Prolog.1.1.5990\lib\net35\SwiPlCs.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Desktop\SWI-Prolog\SwiPlCs_1.1.60301.0\64 bits dll renamed\SwiPlCs.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

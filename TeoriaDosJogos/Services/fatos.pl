@@ -1,0 +1,2 @@
+hello(day).
+goodbye(night).
