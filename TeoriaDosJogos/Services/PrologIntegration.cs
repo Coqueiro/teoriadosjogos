@@ -11,21 +11,14 @@ namespace TeoriaDosJogos.Services
         public static void LoadEnvironment()
         {
             Environment.SetEnvironmentVariable("SWI_HOME_DIR", @"C:\Users\kartg\OneDrive\Documentos\swipl");
-            ////Environment.SetEnvironmentVariable("SWI_HOME_DIR", @"C:\Program Files (x86)\swipl\boot64.prc");
             Environment.SetEnvironmentVariable("Path", @"C:\Users\kartg\OneDrive\Documentos\swipl");
             Environment.SetEnvironmentVariable("Path", @"C:\Users\kartg\OneDrive\Documentos\swipl\bin");
-            ////Environment.SetEnvironmentVariable("Path", @"C\Program Files (x86)\swipl\boot");
-            //string[] p = { "-q", "-f", @"C:\Program Files (x86)\swipl\fatos.pl" };
-            ////string[] p = { "-q", "-f", @"fatos.pl" };
+            //string[] p = { "-q", "-f", @"C:/Users/kartg/OneDrive/Documentos/GitHub/teoriadosjogos/TeoriaDosJogos/Services/fatos.pl" };
             //PlEngine.Initialize(p);
-            //var q = new PlQuery("viado(X)");
-            //Console.WriteLine(q);
-
+            //var q = new PlQuery("hello(X)");
             string[] p = { "-q" };
             PlEngine.Initialize(p);
-            //get my Objects
-
-            PlQuery.PlCall("consult('C:/Users/kartg/OneDrive/Documentos/GitHub/teoriadosjogos/TeoriaDosJogos/Services/fatos.pl')"); //HERE IS THE CHANGE
+            PlQuery.PlCall("consult('C:/Users/kartg/OneDrive/Documentos/GitHub/teoriadosjogos/TeoriaDosJogos/Services/fatos.pl')");
 
             using (PlQuery q = new PlQuery("hello(X)"))
             {
