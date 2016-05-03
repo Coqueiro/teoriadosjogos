@@ -227,7 +227,7 @@ function deleteCheckers(line, row, line2, row2) {
     }
 
     if (markedCheckers.length > 0) {
-        sendGameboard(getNim2DBoard(), "Nim2D");
+        queryGameboard(getNim2DBoard(), "Nim2D");
     }
 }
 

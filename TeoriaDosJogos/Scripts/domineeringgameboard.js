@@ -92,13 +92,13 @@ function domineeringBoardRender() {
             .bind("Delete", function () { this.destroy() })
             .bind("Populate", function (args) {
                 this.color(args[0]);
-                if (args[0] == "blue") this.playerDirection = "vertical";
-                else if (args[0] == "yellow") this.playerDirection = "horizontal";
+                if (args[0] == "blue") this.playerDirection = "v";
+                else if (args[0] == "yellow") this.playerDirection = "h";
                 this.populated = true;
             })
             .bind("Unpopulate", function() {
                 this.color("white");
-                this.playerDirection = "";
+                this.playerDirection = "e";
                 this.populated = false;
             })
             .bind("MouseUp", function () { dominoPlacer(this.line, this.row) });
@@ -106,7 +106,7 @@ function domineeringBoardRender() {
             domino["line"] = lines;
             domino["row"] = rows;
             domino["populated"] = false;
-            domino["playerDirection"] = "";
+            domino["playerDirection"] = "e";
 
             domineeringBoard[domineeringBoardIndex].push(domino);
             x += w + contourLength;
@@ -125,15 +125,15 @@ function dominoPlacer(line, row) {
             if (!domineeringBoard[line - 1][row].populated) {
                 domineeringBoard[line][row].trigger("Populate", new Array("blue"));
                 domineeringBoard[line - 1][row].trigger("Populate", new Array("blue"));
-                playerNorth = !playerNorth;
-                sendGameboard(getDomineeringBoard(), "Domineering");
+                //playerNorth = !playerNorth;
+                queryGameboard(getDomineeringBoard(), "Domineering", "north", setDomineeringBoard);
             }
         } else {
             if (!domineeringBoard[line][row + 1].populated) {
                 domineeringBoard[line][row].trigger("Populate", new Array("yellow"));
                 domineeringBoard[line][row + 1].trigger("Populate", new Array("yellow"));
-                playerNorth = !playerNorth;
-                sendGameboard(getDomineeringBoard(), "Domineering");
+                //playerNorth = !playerNorth;
+                queryGameboard(getDomineeringBoard(), "Domineering", "east", setDomineeringBoard);
             }
         }
     }
@@ -154,9 +154,9 @@ function getDomineeringBoard() {
 function setDomineeringBoard(simpleDomineeringBoard, playerTurn) {
     for (var i = 0; i < simpleDomineeringBoard.length; i++) {
         for (var j = 0; j < simpleDomineeringBoard[i].length; j++) {
-            if (simpleDomineeringBoard[i][j] == "vertical") domineeringBoard[i][j].trigger("Populate", new Array("blue"));
-            else if (simpleDomineeringBoard[i][j] == "horizontal") domineeringBoard[i][j].trigger("Populate", new Array("yellow"));
-            else if (simpleDomineeringBoard[i][j] == "") domineeringBoard[i][j].trigger("Unpopulate");
+            if (simpleDomineeringBoard[i][j] == "v") domineeringBoard[i][j].trigger("Populate", new Array("blue"));
+            else if (simpleDomineeringBoard[i][j] == "h") domineeringBoard[i][j].trigger("Populate", new Array("yellow"));
+            else if (simpleDomineeringBoard[i][j] == "e") domineeringBoard[i][j].trigger("Unpopulate");
         }
     }
 

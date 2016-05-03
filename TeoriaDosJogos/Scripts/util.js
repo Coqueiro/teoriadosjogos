@@ -8,7 +8,7 @@
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-function sendGameboard(gameboard, game) {
+function queryGameboard(gameboard, game, orientation, callback) {
 
     var setData = {
         gameboard: gameboard,
@@ -22,6 +22,9 @@ function sendGameboard(gameboard, game) {
         dataType: "json",
         xhrFields: {
             withCredentials: true
+        },
+        success: function (data) {
+            callback(data, orientation);
         }
     });
 }

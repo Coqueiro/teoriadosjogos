@@ -131,7 +131,7 @@ function deleteSticks(line, row) {
         }
     }
 
-    sendGameboard(getNimBoard(), "Nim");
+    queryGameboard(getNimBoard(), "Nim");
 }
 
 function getNimBoard() {

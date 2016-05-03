@@ -10,13 +10,13 @@ namespace TeoriaDosJogos.Controllers
 {
     public class PrologController : Controller
     {
-        //public async Task GameIntel(GameboardModel gameboardModel)
-        public GameboardModel GameIntel(GameboardModel gameboardModel)
+        [HttpPost]
+        public string GameIntel(GameboardModel gameboardModel)
         {
-            PrologIntegration.LoadEnvironment();
-            return gameboardModel;
-            //var content = new StringContent(JsonConvert.SerializeObject(gameboardModel), Encoding.UTF8, "application/json");
-            //await new HttpClient.PostAsync("/", content);
+            var gameboardString = PrologUtils.GameboardToString(gameboardModel.Gameboard);            
+            var gameboardStringQuery = PrologIntegration.LoadEnvironment(gameboardString);
+            var gameboardQuery = PrologUtils.StringToGameboard(gameboardStringQuery);
+            return JsonConvert.SerializeObject(gameboardQuery);
         }
     }
 }
