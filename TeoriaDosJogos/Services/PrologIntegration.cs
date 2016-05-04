@@ -11,7 +11,7 @@ namespace TeoriaDosJogos.Services
 
             Environment.SetEnvironmentVariable("SWI_HOME_DIR", projectPath + @"swipl");
             Environment.SetEnvironmentVariable("Path", projectPath + @"swipl");
-            Environment.SetEnvironmentVariable("Path", projectPath + @"swipl\bin");
+            Environment.SetEnvironmentVariable("Path", projectPath + @"swipl\\bin");
             
             if (!PlEngine.IsInitialized)
             {
