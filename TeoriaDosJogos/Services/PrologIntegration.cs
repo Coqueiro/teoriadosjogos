@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using SbsSW.SwiPlCs;
+﻿using SbsSW.SwiPlCs;
+using System;
 
 namespace TeoriaDosJogos.Services
 {
@@ -10,13 +7,15 @@ namespace TeoriaDosJogos.Services
     {
         public static string LoadEnvironment(string gameboard)
         {
-            Environment.SetEnvironmentVariable("SWI_HOME_DIR", @"C:\Users\kartg\OneDrive\Documentos\swipl");
-            Environment.SetEnvironmentVariable("Path", @"C:\Users\kartg\OneDrive\Documentos\swipl");
-            Environment.SetEnvironmentVariable("Path", @"C:\Users\kartg\OneDrive\Documentos\swipl\bin");
+            var projectPath = System.AppDomain.CurrentDomain.BaseDirectory;
 
+            Environment.SetEnvironmentVariable("SWI_HOME_DIR", projectPath + @"swipl");
+            Environment.SetEnvironmentVariable("Path", projectPath + @"swipl");
+            Environment.SetEnvironmentVariable("Path", projectPath + @"swipl\bin");
+            
             if (!PlEngine.IsInitialized)
             {
-                string[] p = { "-q", "-f", @"C:/Users/kartg/OneDrive/Documentos/GitHub/teoriadosjogos/TeoriaDosJogos/Services/domineering.pl" };
+                string[] p = { "-q", "-f", projectPath + @"Services\\domineering.pl" };
                 PlEngine.Initialize(p);
                 //string[] p = { "-q" };
                 //PlEngine.Initialize(p);

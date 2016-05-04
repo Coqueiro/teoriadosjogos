@@ -79,3 +79,4 @@ C:\Users\kartg\OneDrive\Documentos\GitHub\teoriadosjogos\TeoriaDosJogos\bin\Micr
 C:\Users\kartg\OneDrive\Documentos\GitHub\teoriadosjogos\TeoriaDosJogos\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
 C:\Users\kartg\OneDrive\Documentos\GitHub\teoriadosjogos\TeoriaDosJogos\obj\x64\Debug\TeoriaDosJogos.dll
 C:\Users\kartg\OneDrive\Documentos\GitHub\teoriadosjogos\TeoriaDosJogos\obj\x64\Debug\TeoriaDosJogos.pdb
+C:\Users\kartg\OneDrive\Documentos\GitHub\teoriadosjogos\TeoriaDosJogos\obj\x64\Debug\TeoriaDosJogos.csprojResolveAssemblyReference.cache
