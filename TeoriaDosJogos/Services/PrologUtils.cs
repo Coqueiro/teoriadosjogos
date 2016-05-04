@@ -1,5 +1,4 @@
 ﻿using System;
-using TeoriaDosJogos.Models;
 
 namespace TeoriaDosJogos.Services
 {
@@ -18,7 +17,7 @@ namespace TeoriaDosJogos.Services
             return resultString.Substring(0, resultString.Length - 1);
         }
 
-        public static char[][] StringToGameboard(string gameboard)
+        public static char[][] StringToGameboard(string gameboard, int[] gameboardLines)
         {
             string[] charsToTrim = { "b", ",", "(", ")" };
             var gameboardTrim = gameboard;
@@ -29,18 +28,22 @@ namespace TeoriaDosJogos.Services
             }
 
             var gameboardArray = gameboardTrim.ToCharArray();
-            var numberOfLines = 8;
-            var numberOfColumns = 8;
-            var gameboardResult = new char[numberOfLines][];
 
-            for (int iterator = 0; iterator < gameboardResult.Length; iterator++)
+            var gameboardResult = new char[gameboardLines.Length][];
+
+            var iterator = 0;
+            for (iterator = 0; iterator < gameboardLines.Length; iterator++)
             {
-                gameboardResult[iterator] = new char[numberOfColumns];
+                gameboardResult[iterator] = new char[gameboardLines[iterator]];
             }
 
-            for(int iterator = 0; iterator < gameboardArray.Length; iterator++)
-            {
-                gameboardResult[iterator / numberOfLines][iterator % 8] = gameboardArray[iterator];
+            iterator = 0;
+            for (int iteratorLines = 0; iteratorLines < gameboardLines.Length; iteratorLines++)
+            { 
+                for (int iteratorColumns = 0; iteratorColumns < gameboardLines[iteratorLines]; iteratorColumns++)
+                {
+                    gameboardResult[iteratorLines][iteratorColumns] = gameboardArray[iterator++];
+                }
             }
 
             return gameboardResult;

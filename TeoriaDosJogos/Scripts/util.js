@@ -8,12 +8,15 @@
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-function queryGameboard(gameboard, game, orientation, callback) {
+function queryGameboard(gameboard, game, options, callback) {
 
     var setData = {
         gameboard: gameboard,
         game: game
     }
+
+    if (options.level != undefined) setData["level"] = options.level;
+    if (options.miserie != undefined) setData["miserie"] = options.miserie;
 
     $.ajax({
         type: 'POST',
@@ -24,7 +27,7 @@ function queryGameboard(gameboard, game, orientation, callback) {
             withCredentials: true
         },
         success: function (data) {
-            callback(data, orientation);
+            if (game == "Domineering") callback(data, options.orientation);            
         }
     });
 }

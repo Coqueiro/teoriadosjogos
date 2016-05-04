@@ -212,6 +212,7 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Helpers\Utils.cs" />
     <Compile Include="Services\PrologUtils.cs" />
     <Compile Include="Services\PrologIntegration.cs" />
     <Compile Include="Startup.cs" />

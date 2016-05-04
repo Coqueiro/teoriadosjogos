@@ -9,5 +9,11 @@ namespace TeoriaDosJogos.Models
 
         [JsonProperty("gameboard")]
         public string[][] Gameboard { get; set; }
+
+        [JsonProperty("level")]
+        public int Level { get; set; }
+
+        [JsonProperty("miserie")]
+        public string Miserie { get; set; }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Mvc;
+using TeoriaDosJogos.Helpers;
 using TeoriaDosJogos.Models;
 using TeoriaDosJogos.Services;
 
@@ -13,10 +11,18 @@ namespace TeoriaDosJogos.Controllers
         [HttpPost]
         public string GameIntel(GameboardModel gameboardModel)
         {
-            var gameboardString = PrologUtils.GameboardToString(gameboardModel.Gameboard);            
-            var gameboardStringQuery = PrologIntegration.LoadEnvironment(gameboardString);
-            var gameboardQuery = PrologUtils.StringToGameboard(gameboardStringQuery);
+            if (gameboardModel.Game == "Domineering") return Domineering(gameboardModel);
+            else return "";
+        }
+
+        public string Domineering(GameboardModel gameboardModel)
+        {
+            var gameboardString = PrologUtils.GameboardToString(gameboardModel.Gameboard);
+            var gameboardStringQuery = PrologIntegration.DomineeringPlay(gameboardString, gameboardModel.Level);
+            var gameboardQuery = PrologUtils.StringToGameboard(gameboardStringQuery, Utils.LengthArray(gameboardModel.Gameboard));
             return JsonConvert.SerializeObject(gameboardQuery);
         }
+
+
     }
 }
