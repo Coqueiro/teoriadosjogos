@@ -22,7 +22,5 @@ namespace TeoriaDosJogos.Controllers
             var gameboardQuery = PrologUtils.StringToGameboard(gameboardStringQuery, Utils.LengthArray(gameboardModel.Gameboard));
             return JsonConvert.SerializeObject(gameboardQuery);
         }
-
-
     }
 }

@@ -44,6 +44,37 @@ function renderDomineeringStartMenu() {
     .bind("DestroyMenu", function () { this.destroy() });
 }
 
+function renderDomineeringGameOver(message) {
+    Crafty.e("2D, Canvas, Color")
+    .attr({ x: startX, y: startY, w: board[0] * (w + contourLength) + contourLength, h: board.length * (h + contourLength) + contourLength })
+    .color("white", 0.7)
+    .bind("DestroyGameOver", function () { this.destroy() });
+
+    Crafty.e("2D, Canvas, Text")
+    .attr({ x: 200, y: 200 })
+    .text(message)
+    .textColor("black")
+    .bind("DestroyGameOver", function () { this.destroy() });
+
+    Crafty.e("2D, Canvas, Color, Mouse")
+    .attr({ x: 200, y: 220, w: 70, h: 30 })
+    .color("orange")
+    .bind("MouseUp", function () {
+        setupDomineering();
+        Crafty.trigger("DestroyGameOver");
+        Crafty.trigger("Delete");
+    })
+    .bind("MouseOver", function () { this.color("red") })
+    .bind("MouseOut", function () { this.color("orange") })
+    .bind("DestroyGameOver", function () { this.destroy() });
+
+    Crafty.e("2D, Canvas, Text")
+    .attr({ x: 210, y: 230 })
+    .text("Go to Menu!")
+    .textColor("black")
+    .bind("DestroyGameOver", function () { this.destroy() });
+}
+
 function renderDomineeringSelectors() {
     var selectorX = 50;
     var selectorY = 50;
@@ -79,7 +110,8 @@ function domineeringBoardRender() {
 
     Crafty.e("2D, Canvas, Color")
     .attr({ x: startX, y: startY, w: board[0] * (w + contourLength) + contourLength, h: board.length * (h + contourLength) + contourLength })
-    .color("black");
+    .color("black")
+    .bind("Delete", function() {this.destroy() });
 
     while (lines <= board.length) {
         var x = startX + contourLength;
@@ -158,11 +190,15 @@ function getDomineeringBoard() {
 }
 
 function setDomineeringBoard(simpleDomineeringBoard, playerTurn) {
-    for (var i = 0; i < simpleDomineeringBoard.length; i++) {
-        for (var j = 0; j < simpleDomineeringBoard[i].length; j++) {
-            if (simpleDomineeringBoard[i][j] == "v") domineeringBoard[i][j].trigger("Populate", new Array("blue"));
-            else if (simpleDomineeringBoard[i][j] == "h") domineeringBoard[i][j].trigger("Populate", new Array("yellow"));
-            else if (simpleDomineeringBoard[i][j] == "e") domineeringBoard[i][j].trigger("Unpopulate");
+    if (simpleDomineeringBoard == "true") renderDomineeringGameOver("Player won!");
+    else if (simpleDomineeringBoard == "false") renderDomineeringGameOver("Computer won!");
+    else {
+        for (var i = 0; i < simpleDomineeringBoard.length; i++) {
+            for (var j = 0; j < simpleDomineeringBoard[i].length; j++) {
+                if (simpleDomineeringBoard[i][j] == "v") domineeringBoard[i][j].trigger("Populate", new Array("blue"));
+                else if (simpleDomineeringBoard[i][j] == "h") domineeringBoard[i][j].trigger("Populate", new Array("yellow"));
+                else if (simpleDomineeringBoard[i][j] == "e") domineeringBoard[i][j].trigger("Unpopulate");
+            }
         }
     }
 
