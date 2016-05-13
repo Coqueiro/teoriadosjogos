@@ -227,7 +227,10 @@ function deleteCheckers(line, row, line2, row2) {
     }
 
     if (markedCheckers.length > 0) {
-        queryGameboard(getNim2DBoard(), "Nim2D");
+        var options = {};
+        options["level"] = level;
+        options["miserie"] = miserie;
+        queryGameboard(getNim2DBoard(), "Nim2D", options, setNim2DBoard);
     }
 }
 

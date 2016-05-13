@@ -12,6 +12,7 @@ namespace TeoriaDosJogos.Controllers
         public string GameIntel(GameboardModel gameboardModel)
         {
             if (gameboardModel.Game == "Domineering") return Domineering(gameboardModel);
+            else if (gameboardModel.Game == "Nim2D") return Nim2D(gameboardModel);
             else return "";
         }
 
@@ -21,6 +22,12 @@ namespace TeoriaDosJogos.Controllers
             var gameboardStringQuery = PrologIntegration.DomineeringPlay(gameboardString, gameboardModel.Level);
             var gameboardQuery = PrologUtils.StringToGameboard(gameboardStringQuery, Utils.LengthArray(gameboardModel.Gameboard));
             return JsonConvert.SerializeObject(gameboardQuery);
+        }
+
+        public string Nim2D(GameboardModel gameboardModel)
+        {
+            //Code containing request of next play
+            return "board";
         }
     }
 }

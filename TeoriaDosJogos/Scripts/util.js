@@ -27,7 +27,8 @@ function queryGameboard(gameboard, game, options, callback) {
             withCredentials: true
         },
         success: function (data) {
-            if (game == "Domineering") callback(data, options.orientation);            
+            if (game == "Domineering") callback(data, options.orientation);
+            else if (game == "Nim2D") callback(data);
         }
     });
 }
