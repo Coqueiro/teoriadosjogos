@@ -62,7 +62,7 @@ function renderDomineeringGameOver(message) {
     .bind("MouseUp", function () {
         setupDomineering();
         Crafty.trigger("DestroyGameOver");
-        Crafty.trigger("Delete");
+        Crafty.trigger("Terminate");
     })
     .bind("MouseOver", function () { this.color("red") })
     .bind("MouseOut", function () { this.color("orange") })
@@ -111,7 +111,7 @@ function domineeringBoardRender() {
     Crafty.e("2D, Canvas, Color")
     .attr({ x: startX, y: startY, w: board[0] * (w + contourLength) + contourLength, h: board.length * (h + contourLength) + contourLength })
     .color("black")
-    .bind("Delete", function() {this.destroy() });
+    .bind("Terminate", function() {this.destroy() });
 
     while (lines <= board.length) {
         var x = startX + contourLength;
@@ -121,7 +121,7 @@ function domineeringBoardRender() {
             domino = Crafty.e("2D, Canvas, Color, Mouse")
             .attr({ x: x, y: y, w: w, h: h })
             .color("white")
-            .bind("Delete", function () { this.destroy() })
+            .bind("Terminate", function () { this.destroy() })
             .bind("Populate", function (args) {
                 this.color(args[0]);
                 if (args[0] == "blue") this.playerDirection = "v";
