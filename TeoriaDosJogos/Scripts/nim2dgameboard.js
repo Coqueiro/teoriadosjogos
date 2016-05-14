@@ -48,6 +48,37 @@ function renderNim2DStartMenu() {
     .bind("DestroyMenu", function () { this.destroy() });
 }
 
+function renderNim2DGameOver(message) {
+    Crafty.e("2D, Canvas, Color")
+    .attr({ x: startX, y: startY, w: board[0] * (w + contourLength) + contourLength, h: board.length * (h + contourLength) + contourLength })
+    .color("white", 0.7)
+    .bind("DestroyGameOver", function () { this.destroy() });
+
+    Crafty.e("2D, Canvas, Text")
+    .attr({ x: 200, y: 200 })
+    .text(message)
+    .textColor("black")
+    .bind("DestroyGameOver", function () { this.destroy() });
+
+    Crafty.e("2D, Canvas, Color, Mouse")
+    .attr({ x: 200, y: 220, w: 70, h: 30 })
+    .color("orange")
+    .bind("MouseUp", function () {
+        setupNim2D();
+        Crafty.trigger("DestroyGameOver");
+        Crafty.trigger("Terminate");
+    })
+    .bind("MouseOver", function () { this.color("red") })
+    .bind("MouseOut", function () { this.color("orange") })
+    .bind("DestroyGameOver", function () { this.destroy() });
+
+    Crafty.e("2D, Canvas, Text")
+    .attr({ x: 210, y: 230 })
+    .text("Go to Menu!")
+    .textColor("black")
+    .bind("DestroyGameOver", function () { this.destroy() });
+}
+
 function renderNim2DSelectors() {
     var selectorX = 50;
     var selectorY = 50;
@@ -137,7 +168,8 @@ function checkersPositioner() {
                         }
                     }
                 }
-            });
+            })
+            .bind("Terminate", function () { this.destroy() });;
 
             checker["line"] = lines;
             checker["row"] = rows;
@@ -247,6 +279,8 @@ function getNim2DBoard() {
 }
 
 function setNim2DBoard(simpleNim2DBoard) {
+    if (simpleNim2DBoard == "true") renderNim2DGameOver("Player won!");
+    else if (simpleNim2DBoard == "false") renderNim2DGameOver("Computer won!");
     for (var i = 0; i < simpleNim2DBoard.length; i++) {
         for (var j = 0; j < simpleNim2DBoard[i].length; j++) {
             if (simpleNim2DBoard[i][j] == false) checkerBoard[i][j].trigger("Undelete");
