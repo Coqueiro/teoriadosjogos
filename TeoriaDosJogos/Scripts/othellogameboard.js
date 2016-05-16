@@ -260,7 +260,9 @@ function turnPieces(line1, row1, line2, row2) {
         if (row1 != row2) row1 = nextNumber(row1, row2);
     }
     othelloBoard[line2][row2].trigger("Populate");
-    queryGameboard(getOthelloBoard(), "Othello");
+    var options = {};
+    options["level"] = level;
+    queryGameboard(getOthelloBoard(), "Othello", options, setOthelloBoard);
 }
 
 
