@@ -3,13 +3,34 @@
 % Author: Robinson Callou
 % Date: 02/04/2016
 %
+% Domineering modelo Jogador Vs IA com mÃºltiplas dificuldades
+% IndicaÃ§Ã£o: 2-Principiante, 3-Amador, 4-intermediario, 5-AvanÃ§ado, 6-Mestre
+%
+% computerV. - A IA joga na vertical
+% computerH. - A IA joga na horizontal
+% playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2). - Movimento do Jogador
+% playComputer(NewBoard, Sign, Board, Level). - Movimento da IA
+%
+% Tabuleiro inicial
+%
+%   1 2 3 4 5 6 7 8
+% 1| | | | | | | | |
+% 2| | | | | | | | |
+% 3| | | | | | | | |
+% 4| | | | | | | | |
+% 5| | | | | | | | |
+% 6| | | | | | | | |
+% 7| | | | | | | | |
+% 8| | | | | | | | |
+%
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%  MANIPULAÇÃO DO JOGO  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%  MANIPULAÃ‡ÃƒO DO JOGO  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Convenções
+% ConvenÃ§Ãµes
 turnToSign(v, v).
 turnToSign(h, h).
 enemy(v, h).
@@ -17,14 +38,14 @@ enemy(h, v).
 nextPlayer(v, h).
 nextPlayer(h, v).
 
-% Guarda peças no tabuleiro
+% Guarda peÃ§as no tabuleiro
 putSign(Board, Line, Col, Sign, NewBoard) :-
  Place is ((Line - 1) * 8) + Col,
  Board =.. [b|List],
  replace(List, Place, Sign, NewList),
  NewBoard =.. [b|NewList].
 
-% Manipulação de partículas atómicas
+% ManipulaÃ§Ã£o de partÃ­culas atÃ³micas
 replace(List, Place, Val, NewList) :-
  replace(List, Place, Val, NewList, 1).
  replace( [], _, _, [], _).
@@ -35,19 +56,19 @@ replace([X|Xs], Place, Val, [X|Ys], Counter) :-
  NewCounter is Counter + 1,
  replace(Xs, Place, Val, Ys, NewCounter).
 
-% Retorna, numericamente, a posição de uma peça
+% Retorna, numericamente, a posiÃ§Ã£o de uma peÃ§a
 findPiece(Board, S, Line, Col) :-
  arg(Num, Board, S),
  Temp is Num / 8,
  ceiling(Temp, Line),
  Col is Num - ((Line - 1) * 8).
 
-% Recebe a peça correta
+% Recebe a peÃ§a correta
 getPiece(Board, Line, Col, P) :-
  getPos(Board, Line, Col, P),
  (P = v ; P = h).
 
-% Recebe a posição
+% Recebe a posiÃ§Ã£o
 getPos(Board, Line, Col, Sign) :-
  Num is ((Line - 1) * 8) + Col,
  arg(Num, Board, Sign).
@@ -56,13 +77,13 @@ getPos(Board, Line, Col, Sign) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  JOGADAS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Realiza o movimento das peças
+% Realiza o movimento das peÃ§as
 move(Board, Sign, NewBoard) :-
  validMove(Board, Sign, NewBoard).%Valida o movimento.
 move(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
  validMove(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).%Valida o movimento.
 
-% Um movimento é valido se:
+% Um movimento Ã© valido se:
 validMove(Board, Sign, NewBoard) :-
  validStdMove(Board, Sign, _, _, _, _, NewBoard).%Movimento normal.
 validMove(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
@@ -74,7 +95,7 @@ validStdMove(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
  movePiece(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).
  %write(L),write('/'),write(C),write('-'),write(Tl),write('/'),write(Tc),nl.
 
-% Valida um único movimento normal
+% Valida um Ãºnico movimento normal
 validateMove(Board, v, ToL1, ToC1, ToL2, ToC2) :-
  findPiece(Board, e, ToL1, ToC1),
  ToL2 is ToL1 + 1, 
@@ -92,26 +113,26 @@ movePiece(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
  putSign(TempBoard, ToL2, ToC2, Sign, NewBoard).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%  JOGADAS PSEUDO-ALEATÓRIAS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%  JOGADAS PSEUDO-ALEATÃ“RIAS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Realiza o movimento das peças
-moveRandom(Board, Sign, NewBoard) :-
- validMoveRandom(Board, Sign, NewBoard).%Valida o movimento.
-moveRandom(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
- validMoveRandom(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).%Valida o movimento.
+% Realiza o movimento das peÃ§as
+moveRandom(Board, Sign, NewBoard, Size) :-
+ validMoveRandom(Board, Sign, NewBoard, Size).%Valida o movimento.
+moveRandom(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard, Size) :-
+ validMoveRandom(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard, Size).%Valida o movimento.
 
-% Um movimento é valido se:
-validMoveRandom(Board, Sign, NewBoard) :-
- validStdMoveRandom(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).%Movimento normal.
-validMoveRandom(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
- validStdMoveRandom(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).%Movimento normal.
+% Um movimento Ã© valido se:
+validMoveRandom(Board, Sign, NewBoard, Size) :-
+ validStdMoveRandom(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard, Size).%Movimento normal.
+validMoveRandom(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard, Size) :-
+ validStdMoveRandom(Board, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard, Size).%Movimento normal.
 
 % Valida um movimento normal, quer-se realizar somente uma jogada.
-validStdMoveRandom(Board, Sign, _, _, _, _, NewBoard) :-
+validStdMoveRandom(Board, Sign, _, _, _, _, NewBoard, Size) :-
  (
-  random_between(1, 8, ToL1),
-  random_between(1, 8, ToC1),
+  random_between(1, Size, ToL1),
+  random_between(1, Size, ToC1),
   findPiece(Board, e, ToL1, ToC1),!,
   (
    Sign = v,!,
@@ -129,7 +150,7 @@ validStdMoveRandom(Board, Sign, _, _, _, _, NewBoard) :-
   random_member(_/NewBoard, PosList),!
  ).
 
-% Próximos movimentos
+% PrÃ³ximos movimentos
 moves(Turn/Board, [B|Bs]) :-
  nextPlayer(Turn, NextTurn),
  findall(NextTurn/NewBoard, validMove(Board, Turn, NewBoard), [B|Bs]).
@@ -138,27 +159,29 @@ moves(Turn/Board, [B|Bs]) :-
 %%%%%%%%%%%%%%%%%%%%%%  PREDICADOS CENTRAIS DO JOGO  %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Jogador começa
+% Jogador comeÃ§a
 computerV :-
- assert(min_to_move(h/_)),assert(max_to_move(v/_)).
+ assert(min2Move(h/_)),assert(max2Move(v/_)).
 
-% Computador começa
+% Computador comeÃ§a
 computerH :-
- assert(min_to_move(v/_)),assert(max_to_move(h/_)).
+ assert(min2Move(v/_)),assert(max2Move(h/_)).
 
-% Captura o próximo movimento
+% Captura o prÃ³ximo movimento
 playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2) :-
  move(Board, Sign, X1, Y1, X2, Y2, NewBoard),!.% Jogada
 
 % Movimento do Computador
 playComputer(NewBoard, Sign, Board, Level) :-
- validMove(Board, Sign, _),!,% Verifica se existe algum movimento válido
+ validMove(Board, Sign, _),!,% Verifica se existe algum movimento vÃ¡lido
  (
   openningMove(NewBoard, Sign, Board, Level),!
   ;
-  alphabeta(Sign/Board, 0, 0, _/NewBoard, _, Level),!% Chama AI
- ).
-% moveRandom(Board, Sign, NewBoard),!.% Random AI
+  callMinMax(Sign/Board, -100, 100, _/NewBoard, _, Level, 10),!% Chama AI
+ ),
+% write(NewBoard),nl,
+% moveRandom(Board, Sign, NewBoard, Size),% Random AI
+ !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%  CALCULO DA JOGADA DO COMPUTADOR  %%%%%%%%%%%%%%%%%%%%%%
@@ -173,89 +196,126 @@ openningMove(NewBoard, Sign, Board, Level) :-
 % Adaptado de A. Visser, Game Playing, University of Amsterdam, 2007
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-alphabeta(Pos, Alpha, Beta, GoodPos, Val, Depth) :-
+callMinMax(Pos, Alpha, Beta, GoodPos, Val, Depth, BDepth) :-
+ loopAlphaBeta(Pos, Alpha, Beta, GoodPos, Val, Depth, BDepth),
+% write(Val),write(GoodPos),nl,
+ !.
+
+loopAlphaBeta(Pos, Alpha, Beta, GoodPos, Val, Depth, BDepth) :-
  (
-  Depth > 0,!,
+  Depth > 0,
   moves(Pos, PosList),!,
-  boundedbest(PosList, Alpha, Beta, GoodPos, Val, Depth)
+  bestBound(PosList, Alpha, Beta, GoodPos, Val, Depth, BDepth)
   ;
-  staticval(Pos, Val),!
- ).							% Retorno da Posição
+  staticValuation(Pos, SVal),!,						% MinMax
+  dinamicValuation(Pos, DVal, BDepth),!,				% Monte Carlo
+  Val is 10*SVal + DVal,!
+ ).									% Retorno da PosiÃ§Ã£o
 
-boundedbest([Pos|PosList], Alpha, Beta, GoodPos, GoodVal, Depth) :-
+bestBound([Pos|PosList], Alpha, Beta, GoodPos, GoodVal, Depth, BDepth) :-
  NewDepth is Depth - 1,
- alphabeta(Pos, Alpha, Beta, _, Val, NewDepth),
- goodenough(PosList, Alpha, Beta, Pos, Val, GoodPos, GoodVal, Depth).
+ loopAlphaBeta(Pos, Alpha, Beta, _, Val, NewDepth, BDepth),
+ goodEnough(PosList, Alpha, Beta, Pos, Val, GoodPos, GoodVal, Depth, BDepth).
 
-goodenough([], _, _, Pos, Val, Pos, Val, _)  :-  !.			% Parada
-goodenough(_, Alpha, Beta, Pos, Val, Pos, Val, _)  :-
+goodEnough([], _, _, Pos, Val, Pos, Val, _, _)  :-  !.			% Parada
+goodEnough(_, Alpha, Beta, Pos, Val, Pos, Val, _, _)  :-
  (
-  min_to_move(Pos), Val > Beta,!					% Max atingiu limite superior
+  min2Move(Pos), Val > Beta,!						% Max atingiu limite superior
   ;
-  max_to_move(Pos), Val < Alpha,!					% Min atingiu limite inferior
+  max2Move(Pos), Val < Alpha,!						% Min atingiu limite inferior
  ).
-goodenough(PosList, Alpha, Beta, Pos, Val, GoodPos, GoodVal, Depth) :-	% Ajusta limites
- newbounds(Alpha, Beta, Pos, Val, NewAlpha, NewBeta),
- boundedbest(PosList, NewAlpha, NewBeta, Pos1, Val1, Depth),
- betterof(Pos, Val, Pos1, Val1, GoodPos, GoodVal).
+goodEnough(PosList, Alpha, Beta, Pos, Val, GoodPos, GoodVal, Depth, BDepth) :-	% Ajusta limites
+ newtBound(Alpha, Beta, Pos, Val, NewAlpha, NewBeta),
+ bestBound(PosList, NewAlpha, NewBeta, Pos1, Val1, Depth, BDepth),
+ betterBound(Pos, Val, Pos1, Val1, GoodPos, GoodVal).
 
 % Ajustando limites
-newbounds(Alpha, Beta, Pos, Val, Val, Beta) :-
- min_to_move(Pos), Val > Alpha,!.					% Max aumentou limite superior
-newbounds(Alpha, Beta, Pos, Val, Alpha, Val) :-
- max_to_move(Pos), Val < Beta,!.					% Min diminuiu limite inferior
-newbounds(Alpha, Beta, _, _, Alpha, Beta).				% limites não mudaram
+newtBound(Alpha, Beta, Pos, Val, Val, Beta) :-
+ min2Move(Pos), Val > Alpha,!.						% Max aumentou limite superior
+newtBound(Alpha, Beta, Pos, Val, Alpha, Val) :-
+ max2Move(Pos), Val < Beta,!.						% Min diminuiu limite inferior
+newtBound(Alpha, Beta, _, _, Alpha, Beta).				% limites nÃ£o mudaram
 
-% Acha qual a melhor Posição dado seu Retorno
-betterof(Pos, Val, Pos1, Val1, Pos, Val) :-				% Pos > Pos1
+% Acha qual a melhor PosiÃ§Ã£o dado seu Retorno
+betterBound(Pos, Val, Pos1, Val1, Pos, Val) :-				% Pos > Pos1
  (
-  min_to_move(Pos), Val > Val1,!
+  min2Move(Pos), Val > Val1,!
   ;
-  max_to_move(Pos), Val < Val1,!
+  max2Move(Pos), Val < Val1,!
  ).
-betterof(_, _, Pos1, Val1, Pos1, Val1).
+betterBound(_, _, Pos1, Val1, Pos1, Val1).
 
-% Heurística
-staticval(Turn/Board, Res) :-
- playRandomLoop(Board, Turn, Wins, Losses, 10),
-% random_between(1, 10, Wins),random_between(1, 10, Losses),
+
+
+% HeurÃ­stica
+staticValuation(Turn/Board, Res) :-
+ boardBonus(Turn, Board, ResBonus),
  (
-  min_to_move(Turn/_),
-  ResCount is Losses/2 - Wins/2,!
+  min2Move(Turn/_),
+  Res is - ResBonus
   ;
-  max_to_move(Turn/_),
-  ResCount is Wins/2 - Losses/2,!
- ),
- boardBonus(Board, Turn, ResBonus),
- Res is ResCount + ResBonus,
-% !,printBoard(Board),
-% write(Res),nl,
- !.
+  max2Move(Turn/_),
+  Res is ResBonus
+ ),!.
+
+% HeurÃ­stica
+dinamicValuation(Turn/Board, Res, BDepth) :-
+ playRandomLoop(Board, Turn, Wins, Losses, BDepth),
+ (
+  min2Move(Turn/_),
+  Res is Losses - Wins
+  ;
+  max2Move(Turn/_),
+  Res is Wins - Losses
+ ),!.
 
 % Contador
 playRandomLoop(Board, Sign, Wins, Losses, Loop) :-
- countGames(Board, Sign, Wins, Losses, Loop, 0,0).
+ countGames(Board, Sign, Wins, Losses, Loop, 0, 0, 8).
 
-countGames(_, _, CounterWin, CounterLoss, 0, CounterWin, CounterLoss) :- !.
-countGames(Board, Sign, Wins, Losses, Loop, CounterWin, CounterLoss) :-
- playRandom(Board, Sign, Win, Loss),
+countGames(_, _, CounterWin, CounterLoss, 0, CounterWin, CounterLoss, _) :- !.
+countGames(Board, Sign, Wins, Losses, Loop, CounterWin, CounterLoss, Size) :-
+ playRandom(Board, Sign, Win, Loss, Size),
  CounterWin1 is CounterWin + Win,
  CounterLoss1 is CounterLoss + Loss,
  Loop1 is Loop - 1,
- countGames(Board, Sign, Wins, Losses, Loop1, CounterWin1, CounterLoss1).
+ countGames(Board, Sign, Wins, Losses, Loop1, CounterWin1, CounterLoss1, Size).
 
-playRandom(Board, Sign, Win, Loss) :-
+playRandom(Board, Sign, Win, Loss, Size) :-
  (
-  moveRandom(Board, Sign, NewBoard),!
+  moveRandom(Board, Sign, NewBoard, Size),!
   ->
-  enemy(Sign, NewSign),playRandom(NewBoard, NewSign, Loss, Win),!
+  enemy(Sign, NewSign),
+  playRandom(NewBoard, NewSign, Loss, Win, Size),!
   ;
-  Win is 0,Loss is 1,true
+  Win is 0, Loss is 1, true
  ).
 
 % Bonus
-boardBonus(_, _, ResBonus) :-
- ResBonus is 0.
+boardBonus(Turn, Board, Bonus) :-
+ enemy(Turn, EnemyTurn),
+ countBonus(Turn, EnemyTurn, Board, Bonus, 8, 0, 8).
+
+countBonus(_, _, _, Bonus, 0, Bonus, _) :- !.
+countBonus(Turn, EnemyTurn, Board, Bonus, Loop, CounterBonus, Size) :-
+ incrementalBonus(Turn, Loop, Board, BonusT, Size),
+ incrementalBonus(EnemyTurn, Loop, Board, BonusE, Size),
+ CounterBonus1 is CounterBonus + 2*BonusT - BonusE,
+% write(BonusT),write(BonusE),write(Loop),nl,
+ Loop1 is Loop - 1,
+ countBonus(Turn, EnemyTurn, Board, Bonus, Loop1, CounterBonus1, Size).
+
+incrementalBonus(v, Line, Board, Bonus, Size) :-
+ (findPiece(Board, v, Line, 2), findPiece(Board, e, Line, 1) -> BonusA is 1 ; BonusA is 0),
+ Aux is Size - 1,
+ (findPiece(Board, v, Line, Aux), findPiece(Board, e, Line, Size) -> BonusB is 1 ; BonusB is 0),
+ Bonus is BonusA + BonusB.
+
+incrementalBonus(h, Col, Board, Bonus, Size) :-
+ (findPiece(Board, h, 2, Col), findPiece(Board, e, 1, Col) -> BonusA is 1 ; BonusA is 0),
+ Aux is Size - 1,
+ (findPiece(Board, h, Aux, Col), findPiece(Board, e, Size, Col) -> BonusB is 1 ; BonusB is 0),
+ Bonus is BonusA + BonusB.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  FIM DO PROGRAMA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

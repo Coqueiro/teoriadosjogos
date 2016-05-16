@@ -20,8 +20,15 @@ namespace TeoriaDosJogos.Controllers
         {
             var gameboardString = PrologUtils.GameboardToString(gameboardModel.Gameboard);
             var gameboardStringQuery = PrologIntegration.DomineeringPlay(gameboardString, gameboardModel.Level);
-            var gameboardQuery = PrologUtils.StringToGameboard(gameboardStringQuery, Utils.LengthArray(gameboardModel.Gameboard));
-            return JsonConvert.SerializeObject(gameboardQuery);
+            if (gameboardStringQuery == "")
+            {
+                return JsonConvert.SerializeObject("true");
+            }
+            else
+            {
+                var gameboardQuery = PrologUtils.StringToGameboard(gameboardStringQuery, Utils.LengthArray(gameboardModel.Gameboard));
+                return JsonConvert.SerializeObject(gameboardQuery);
+            }
         }
 
         public string Nim2D(GameboardModel gameboardModel)
