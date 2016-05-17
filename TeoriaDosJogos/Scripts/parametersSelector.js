@@ -8,7 +8,10 @@
     .textColor("black")
     .bind("DestroySelector", function () { this.destroy() });
 
-    var decreaseButton = Crafty.e("2D, Canvas, Color, Mouse")
+    Crafty.sprite(500, "../Sprites/leftarrow.svg", { LeftArrow: [0, 0] });
+    Crafty.sprite(500, "../Sprites/rightarrow.svg", { RightArrow: [0, 0] });
+
+    var decreaseButton = Crafty.e("2D, Canvas, Color, LeftArrow, Mouse")
     .attr({ x: startX + spacing + space, y: startY, w: size, h: size })
     .color("orange")
     .bind("MouseUp", function () { Crafty.trigger("DecreaseArray", new Array(this.selectorName)) })
@@ -18,7 +21,7 @@
 
     decreaseButton["selectorName"] = selectorName;
     
-    var increaseButton = Crafty.e("2D, Canvas, Color, Mouse")
+    var increaseButton = Crafty.e("2D, Canvas, Color, RightArrow, Mouse")
     .attr({ x: startX + spacing + size + 2 * space, y: startY, w: size, h: size })
     .color("orange")
     .bind("MouseUp", function () { Crafty.trigger("IncreaseArray", new Array(this.selectorName)) })
