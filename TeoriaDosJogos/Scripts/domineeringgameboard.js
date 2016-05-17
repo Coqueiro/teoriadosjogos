@@ -6,6 +6,7 @@
     window.freeze = false;
     if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 2;
     if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 8;
+    if (typeof firstPlayer == "undefined") window.firstPlayer = getParameterByName("firstPlayer") || 0;
     startMenuDomineering();
 }
 
@@ -84,6 +85,8 @@ function renderDomineeringSelectors() {
     createArraySelector("Dificuldade", "level", spacing, [0, 1, 2], 2, selectorX, selectorY);
     selectorY = selectorY + height;
     createArraySelector("Tamanho", "lines", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
+    selectorY = selectorY + height;
+    createArraySelector("Primeiro player", "firstPlayer", spacing, ["Vertical", "Horizontal"], 0, selectorX, selectorY);
 }
 
 function initDomineeringGame() {
@@ -92,6 +95,13 @@ function initDomineeringGame() {
     rows = lines;
     domineeringBoardGenerator(lines, rows);
     domineeringBoardRender();
+    if (firstPlayer == "Horizontal") {
+        freeze = true;
+        var options = {};
+        options["level"] = level;
+        options["orientation"] = "north";
+        queryGameboard(getDomineeringBoard(), "Domineering", options, setDomineeringBoard);
+    };
 }
 
 function domineeringBoardGenerator(lines, rows) {
