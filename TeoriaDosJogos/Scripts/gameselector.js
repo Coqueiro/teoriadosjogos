@@ -2,6 +2,8 @@
 var startY = 10;
 var dimensionX = 500;
 var dimensionY = 500;
+var w = 100;
+var h = 30;
 
 renderGameMenu();
 
@@ -24,7 +26,7 @@ function renderGameMenu() {
 
 function nimButton(initialY) {
     Crafty.e("2D, Canvas, Color, Mouse")
-    .attr({ x: 200, y: initialY + 20, w: 70, h: 30 })
+    .attr({ x: 200, y: initialY + 20, w: w, h: h })
     .color("orange")
     .bind("MouseUp", function () {
         setupNim();
@@ -43,7 +45,7 @@ function nimButton(initialY) {
 
 function nim2DButton(initialY) {
     Crafty.e("2D, Canvas, Color, Mouse")
-    .attr({ x: 200, y: initialY + 20, w: 70, h: 30 })
+    .attr({ x: 200, y: initialY + 20, w: w, h: h })
     .color("orange")
     .bind("MouseUp", function () {
         setupNim2D();
@@ -62,7 +64,7 @@ function nim2DButton(initialY) {
 
 function domineeringButton(initialY) {
     Crafty.e("2D, Canvas, Color, Mouse")
-    .attr({ x: 200, y: initialY + 20, w: 70, h: 30 })
+    .attr({ x: 200, y: initialY + 20, w: w, h: h })
     .color("orange")
     .bind("MouseUp", function () {
         setupDomineering();
@@ -82,7 +84,7 @@ function domineeringButton(initialY) {
 
 function othelloButton(initialY) {
     Crafty.e("2D, Canvas, Color, Mouse")
-    .attr({ x: 200, y: initialY + 20, w: 70, h: 30 })
+    .attr({ x: 200, y: initialY + 20, w: w, h: h })
     .color("orange")
     .bind("MouseUp", function () {
         setupOthello();

@@ -5,7 +5,6 @@
     window.startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
     if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 2;
     if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 8;
-    if (typeof rows == "undefined") window.rows = parseInt(getParameterByName("rows")) || 8;
     startMenuDomineering();
 }
 
@@ -83,14 +82,13 @@ function renderDomineeringSelectors() {
 
     createArraySelector("Dificuldade", "level", spacing, [0, 1, 2], 2, selectorX, selectorY);
     selectorY = selectorY + height;
-    createArraySelector("Linhas", "lines", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
-    selectorY = selectorY + height;
-    createArraySelector("Colunas", "rows", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
+    createArraySelector("Tamanho", "lines", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
 }
 
 function initDomineeringGame() {
     Crafty.trigger("DestroyMenu");
     Crafty.trigger("DestroySelector");
+    rows = lines;
     domineeringBoardGenerator(lines, rows);
     domineeringBoardRender();
 }
