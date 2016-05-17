@@ -24,11 +24,13 @@ namespace TeoriaDosJogos.Services
             }
 
             var answer = "";
-            using (PlQuery q = new PlQuery("computerH, playComputer(NewBoard, h, b(" + gameboard + "), " + level + ")"))
+            using (PlQuery q = new PlQuery("computerH, playComputer(NewBoard, h, b(" + gameboard + "), " + level + ", Victory, Defeat)"))
             {
                 foreach (PlQueryVariables v in q.SolutionVariables)
                 {
-                    answer = v["NewBoard"].ToString();
+                    if (v["Defeat"].ToString() == "true") answer = "defeat";
+                    else if (v["Victory"].ToString() == "true") answer = "victory";
+                    else answer = v["NewBoard"].ToString();
                 }
             }
 

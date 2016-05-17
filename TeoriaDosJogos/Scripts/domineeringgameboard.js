@@ -191,8 +191,8 @@ function getDomineeringBoard() {
 }
 
 function setDomineeringBoard(simpleDomineeringBoard, playerTurn) {
-    if (simpleDomineeringBoard == "true") renderDomineeringGameOver("Player won!");
-    else if (simpleDomineeringBoard == "false") renderDomineeringGameOver("Computer won!");
+    if (simpleDomineeringBoard == "true") renderDomineeringGameOver("Computer won!");
+    else if (simpleDomineeringBoard == "false") renderDomineeringGameOver("Player won!");
     else {
         for (var i = 0; i < simpleDomineeringBoard.length; i++) {
             for (var j = 0; j < simpleDomineeringBoard[i].length; j++) {

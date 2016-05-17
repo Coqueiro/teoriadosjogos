@@ -20,9 +20,13 @@ namespace TeoriaDosJogos.Controllers
         {
             var gameboardString = PrologUtils.GameboardToString(gameboardModel.Gameboard);
             var gameboardStringQuery = PrologIntegration.DomineeringPlay(gameboardString, gameboardModel.Level);
-            if (gameboardStringQuery == "")
+            if (gameboardStringQuery == "victory")
             {
                 return JsonConvert.SerializeObject("true");
+            }
+            else if (gameboardStringQuery == "defeat")
+            {
+                return JsonConvert.SerializeObject("false");
             }
             else
             {

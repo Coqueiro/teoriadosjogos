@@ -172,16 +172,27 @@ playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2) :-
  move(Board, Sign, X1, Y1, X2, Y2, NewBoard),!.% Jogada
 
 % Movimento do Computador
-playComputer(NewBoard, Sign, Board, Level) :-
- validMove(Board, Sign, _),!,% Verifica se existe algum movimento válido
+playComputer(NewBoard, Sign, Board, Level, Victory, Defeat) :-
+ (
+  validMove(Board, Sign, _),! 
+  -> 
+  Defeat = false,
+  moveComputer(NewBoard, Sign, Board, Level),!,
+  victoryBoard(NewBoard, Sign, Victory),!
+  ; 
+  Defeat = true,
+  NewBoard = Board,
+  Victory = false
+ ),!.
+moveComputer(NewBoard, Sign, Board, Level) :-
  (
   openningMove(NewBoard, Sign, Board, Level),!
   ;
-  callMinMax(Sign/Board, -100, 100, _/NewBoard, _, Level, 10),!% Chama AI
- ),
-% write(NewBoard),nl,
-% moveRandom(Board, Sign, NewBoard, Size),% Random AI
- !.
+  callMinMax(Sign/Board, -100, 100, _/NewBoard, _, Level, 10),!
+ ).
+victoryBoard(Board, Sign, Victory) :-
+ enemy(Sign, EnemySign),
+ (validMove(Board, EnemySign, _),! -> Victory = false ; Victory = true).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%  CALCULO DA JOGADA DO COMPUTADOR  %%%%%%%%%%%%%%%%%%%%%%
