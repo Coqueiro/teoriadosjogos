@@ -3,6 +3,7 @@
     window.board = [];
     window.playerNorth = true;
     window.startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
+    window.freeze = false;
     if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 2;
     if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 8;
     startMenuDomineering();
@@ -131,7 +132,7 @@ function domineeringBoardRender() {
                 this.playerDirection = "e";
                 this.populated = false;
             })
-            .bind("MouseUp", function () { dominoPlacer(this.line, this.row) });
+            .bind("MouseUp", function () { if(!freeze) dominoPlacer(this.line, this.row) });
 
             domino["line"] = lines;
             domino["row"] = rows;
@@ -156,6 +157,7 @@ function dominoPlacer(line, row) {
                 domineeringBoard[line][row].trigger("Populate", new Array("blue"));
                 domineeringBoard[line - 1][row].trigger("Populate", new Array("blue"));
                 //playerNorth = !playerNorth;
+                freeze = true;
                 var options = {};
                 options["level"] = level;
                 options["orientation"] = "north";
@@ -166,6 +168,7 @@ function dominoPlacer(line, row) {
                 domineeringBoard[line][row].trigger("Populate", new Array("yellow"));
                 domineeringBoard[line][row + 1].trigger("Populate", new Array("yellow"));
                 //playerNorth = !playerNorth;
+                freeze = true;
                 var options = {};
                 options["level"] = level;
                 options["orientation"] = "east";
@@ -202,5 +205,6 @@ function setDomineeringBoard(simpleDomineeringBoard, playerTurn) {
 
     if (playerTurn == "north") playerNorth = true;
     else if (playerTurn == "east") playerNorth = false;
+    freeze = false;
 }
     
