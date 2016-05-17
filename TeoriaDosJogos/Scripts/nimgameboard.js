@@ -1,6 +1,7 @@
 ﻿function setupNim() {
     window.stickBoard = [];
     window.board = [];
+    window.freeze = false;
     window.varianceX = 40, varianceY = 50, startX = 10, startY = 10, w = 20, h = 40;
     if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 0;
     if (typeof miserie == "undefined") window.miserie = (getParameterByName("miserie") === "true") || "Normal";
@@ -102,7 +103,7 @@ function sticksPositioner() {
                 this.color("black");
                 this.destroyed = false;
             })
-            .bind("Click", function () { if(playerSwitch && !this.destroyed) deleteSticks(this.line, this.row) });
+            .bind("Click", function () { if(!freeze && !this.destroyed) deleteSticks(this.line, this.row) });
 
             stick["line"] = lines;
             stick["row"] = rows;

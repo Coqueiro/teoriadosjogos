@@ -142,7 +142,6 @@ function othelloBoardRender() {
         lines++;
 
         if (lines == board.length) {
-            console.log("hi");
             pieces[Math.round(lines / 2) - 1][Math.round(rows / 2) - 1].trigger("Populate", new Array(whiteColor));
             othelloBoard[Math.round(lines / 2) - 1][Math.round(rows / 2) - 1].player = whiteColor;
 
