@@ -142,7 +142,7 @@ function domineeringBoardRender() {
                 this.playerDirection = "e";
                 this.populated = false;
             })
-            .bind("Color", function (args) {
+            .bind("Coloring", function (args) {
                 this.color(args[0]);
             })
             .bind("MouseUp", function () { if (!freeze) dominoPlacer(this.line, this.row) })
@@ -173,13 +173,13 @@ function dominoColor(line, row, color) {
     if (!domineeringBoard[line][row].populated) {
         if (playerNorth) {
             if (!domineeringBoard[line - 1][row].populated) {
-                domineeringBoard[line][row].trigger("Color", new Array(color));
-                domineeringBoard[line - 1][row].trigger("Color", new Array(color));
+                domineeringBoard[line][row].trigger("Coloring", new Array(color));
+                domineeringBoard[line - 1][row].trigger("Coloring", new Array(color));
             }
         } else {
             if (!domineeringBoard[line][row + 1].populated) {
-                domineeringBoard[line][row].trigger("Color", new Array(color));
-                domineeringBoard[line][row + 1].trigger("Color", new Array(color));
+                domineeringBoard[line][row].trigger("Coloring", new Array(color));
+                domineeringBoard[line][row + 1].trigger("Coloring", new Array(color));
             }
         }
     }

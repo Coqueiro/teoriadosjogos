@@ -111,7 +111,16 @@ function othelloBoardRender() {
                 pieces[this.line][this.row].trigger("Populate", new Array(args[0]));
                 this.player = args[0];
             })
-            .bind("MouseUp", function () { spacePlacer(this.line, this.row) });
+            .bind("MouseUp", function () { spacePlacer(this.line, this.row, "") })
+            .bind("Coloring", function (args) {
+                pieces[this.line][this.row].trigger("Coloring", args);
+            })
+            .bind("MouseOver", function (){
+                spacePlacer(this.line, this.row, "red");
+            })
+            .bind("MouseOut", function () {
+                spacePlacer(this.line, this.row, "white");
+            });
 
             space["line"] = lines;
             space["row"] = rows;
@@ -126,6 +135,9 @@ function othelloBoardRender() {
                 if (args[0] == "") this.color("white");
                 else this.color(args[0]);
                 this["player"] = args[0];
+            })
+            .bind("Coloring", function (args) {
+                this.color(args[0]);
             });
 
             piece["player"] = "";
@@ -157,7 +169,7 @@ function othelloBoardRender() {
     }
 }
 
-function spacePlacer(line, row) {
+function spacePlacer(line, row, color) {
     var enemyPiece = false;
     var possiblePlay = false;
     var allyColor, enemyColor;
@@ -173,7 +185,7 @@ function spacePlacer(line, row) {
         while (row + iterator < rows) {
             if (enemyPiece && pieces[line][row + iterator].player == allyColor) {
                 possiblePlay = true;
-                turnPieces(line, row + iterator, line, row);
+                if(color == "") turnPieces(line, row + iterator, line, row);
             } else if (iterator == 1 && pieces[line][row + iterator].player == enemyColor) enemyPiece = true;
             iterator++;
         } 
@@ -183,7 +195,7 @@ function spacePlacer(line, row) {
         while (row + iterator < rows && line - iterator > 0) {
             if (enemyPiece && pieces[line - iterator][row + iterator].player == allyColor) {
                 possiblePlay = true;
-                turnPieces(line - iterator, row + iterator, line, row);
+                if (color == "") turnPieces(line - iterator, row + iterator, line, row);
             } else if (iterator == 1 && pieces[line - iterator][row + iterator].player == enemyColor) enemyPiece = true;
             iterator++;
         }
@@ -193,7 +205,7 @@ function spacePlacer(line, row) {
         while (line - iterator > 0) {
             if (enemyPiece && pieces[line - iterator][row].player == allyColor) {
                 possiblePlay = true;
-                turnPieces(line - iterator, row, line, row);
+                if (color == "") turnPieces(line - iterator, row, line, row);
             } else if (iterator == 1 && pieces[line - iterator][row].player == enemyColor) enemyPiece = true;
             iterator++;
         }
@@ -203,7 +215,7 @@ function spacePlacer(line, row) {
         while (row - iterator > 0 && line - iterator > 0) {
             if (enemyPiece && pieces[line - iterator][row - iterator].player == allyColor) {
                 possiblePlay = true;
-                turnPieces(line - iterator, row - iterator, line, row);
+                if (color == "") turnPieces(line - iterator, row - iterator, line, row);
             } else if (iterator == 1 && pieces[line - iterator][row - iterator].player == enemyColor) enemyPiece = true;
             iterator++;
         }
@@ -213,7 +225,7 @@ function spacePlacer(line, row) {
         while (row - iterator > 0) {
             if (enemyPiece && pieces[line][row - iterator].player == allyColor) {
                 possiblePlay = true;
-                turnPieces(line, row - iterator, line, row);
+                if (color == "") turnPieces(line, row - iterator, line, row);
             } else if (iterator == 1 && pieces[line][row - iterator].player == enemyColor) enemyPiece = true;
             iterator++;
         }
@@ -223,7 +235,7 @@ function spacePlacer(line, row) {
         while (row - iterator > 0 && line + iterator < rows) {
             if (enemyPiece && pieces[line + iterator][row - iterator].player == allyColor) {
                 possiblePlay = true;
-                turnPieces(line + iterator, row - iterator, line, row);
+                if (color == "") turnPieces(line + iterator, row - iterator, line, row);
             } else if (iterator == 1 && pieces[line + iterator][row - iterator].player == enemyColor) enemyPiece = true;
             iterator++;
         }
@@ -233,7 +245,7 @@ function spacePlacer(line, row) {
         while (line + iterator < rows) {
             if (enemyPiece && pieces[line + iterator][row].player == allyColor) {
                 possiblePlay = true;
-                turnPieces(line + iterator, row, line, row);
+                if (color == "") turnPieces(line + iterator, row, line, row);
             } else if (iterator == 1 && pieces[line + iterator][row].player == enemyColor) enemyPiece = true;
             iterator++;
         }
@@ -243,13 +255,27 @@ function spacePlacer(line, row) {
         while (row + iterator < rows && line + iterator < rows) {
             if (enemyPiece && pieces[line + iterator][row + iterator].player == allyColor) {
                 possiblePlay = true;
-                turnPieces(line + iterator, row + iterator, line, row);
+                if (color == "") turnPieces(line + iterator, row + iterator, line, row);
             } else if (iterator == 1 && pieces[line + iterator][row + iterator].player == enemyColor) enemyPiece = true;
             iterator++;
         }
     }
 
-    if (possiblePlay) playerBlack = !playerBlack;
+    if (possiblePlay) {
+        if (color == "") {
+            playerBlack = !playerBlack;
+            var options = {};
+            options["level"] = level;
+            queryGameboard(getOthelloBoard(), "Othello", options, setOthelloBoard);
+        }
+        else {
+            colorPiece(line, row, color);
+        }
+    }
+}
+
+function colorPiece(line, row, color) {
+    othelloBoard[line][row].trigger("Coloring", new Array(color));
 }
 
 function turnPieces(line1, row1, line2, row2) {
@@ -259,9 +285,6 @@ function turnPieces(line1, row1, line2, row2) {
         if (row1 != row2) row1 = nextNumber(row1, row2);
     }
     othelloBoard[line2][row2].trigger("Populate");
-    var options = {};
-    options["level"] = level;
-    queryGameboard(getOthelloBoard(), "Othello", options, setOthelloBoard);
 }
 
 
