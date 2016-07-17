@@ -142,7 +142,16 @@ function domineeringBoardRender() {
                 this.playerDirection = "e";
                 this.populated = false;
             })
-            .bind("MouseUp", function () { if(!freeze) dominoPlacer(this.line, this.row) });
+            .bind("Color", function (args) {
+                this.color(args[0]);
+            })
+            .bind("MouseUp", function () { if (!freeze) dominoPlacer(this.line, this.row) })
+            .bind("MouseOver", function () { 
+                if (!freeze) dominoColor(this.line, this.row, "red");
+            })
+            .bind("MouseOut", function () {
+                if (!freeze) dominoColor(this.line, this.row, "white");
+            });
 
             domino["line"] = lines;
             domino["row"] = rows;
@@ -160,12 +169,30 @@ function domineeringBoardRender() {
     }
 }
 
-function dominoPlacer(line, row) {
+function dominoColor(line, row, color) {
     if (!domineeringBoard[line][row].populated) {
         if (playerNorth) {
             if (!domineeringBoard[line - 1][row].populated) {
-                domineeringBoard[line][row].trigger("Populate", new Array("blue"));
-                domineeringBoard[line - 1][row].trigger("Populate", new Array("blue"));
+                domineeringBoard[line][row].trigger("Color", new Array(color));
+                domineeringBoard[line - 1][row].trigger("Color", new Array(color));
+            }
+        } else {
+            if (!domineeringBoard[line][row + 1].populated) {
+                domineeringBoard[line][row].trigger("Color", new Array(color));
+                domineeringBoard[line][row + 1].trigger("Color", new Array(color));
+            }
+        }
+    }
+}
+
+function dominoPlacer(line, row) { 
+    var color;
+    if (!domineeringBoard[line][row].populated) {
+        if (playerNorth) {
+            color = "blue";
+            if (!domineeringBoard[line - 1][row].populated) {
+                domineeringBoard[line][row].trigger("Populate", new Array(color));
+                domineeringBoard[line - 1][row].trigger("Populate", new Array(color));
                 //playerNorth = !playerNorth;
                 freeze = true;
                 var options = {};
@@ -175,14 +202,15 @@ function dominoPlacer(line, row) {
             }
         } else {
             if (!domineeringBoard[line][row + 1].populated) {
-                domineeringBoard[line][row].trigger("Populate", new Array("yellow"));
-                domineeringBoard[line][row + 1].trigger("Populate", new Array("yellow"));
+                color = "yellow";
+                domineeringBoard[line][row].trigger("Populate", new Array(color));
+                domineeringBoard[line][row + 1].trigger("Populate", new Array(color));
                 //playerNorth = !playerNorth;
                 freeze = true;
                 var options = {};
                 options["level"] = level;
                 options["orientation"] = "east";
-                queryGameboard(getDomineeringBoard(), "Domineering", options, setDomineeringBoard);
+                if (temporary == 0) queryGameboard(getDomineeringBoard(), "Domineering", options, setDomineeringBoard);
             }
         }
     }
