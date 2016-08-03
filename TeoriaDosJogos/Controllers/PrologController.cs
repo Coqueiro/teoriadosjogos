@@ -19,7 +19,7 @@ namespace TeoriaDosJogos.Controllers
         public string Domineering(GameboardModel gameboardModel)
         {
             var gameboardString = PrologUtils.GameboardToString(gameboardModel.Gameboard);
-            var gameboardStringQuery = PrologIntegration.DomineeringPlay(gameboardString, gameboardModel.Level);
+            var gameboardStringQuery = PrologIntegration.DomineeringPlay(gameboardString, gameboardModel);
             if (gameboardStringQuery == "victory")
             {
                 return JsonConvert.SerializeObject("true");
@@ -37,8 +37,21 @@ namespace TeoriaDosJogos.Controllers
 
         public string Nim2D(GameboardModel gameboardModel)
         {
-            //Code containing request of next play
-            return "board";
+            var gameboardString = PrologUtils.GameboardToString(gameboardModel.Gameboard);
+            var gameboardStringQuery = PrologIntegration.Nim2DPlay(gameboardString, gameboardModel);
+            if (gameboardStringQuery == "victory")
+            {
+                return JsonConvert.SerializeObject("true");
+            }
+            else if (gameboardStringQuery == "defeat")
+            {
+                return JsonConvert.SerializeObject("false");
+            }
+            else
+            {
+                var gameboardQuery = PrologUtils.StringToGameboard(gameboardStringQuery, Utils.LengthArray(gameboardModel.Gameboard));
+                return JsonConvert.SerializeObject(gameboardQuery);
+            }
         }
     }
 }

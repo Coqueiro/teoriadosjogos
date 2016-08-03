@@ -15,5 +15,8 @@ namespace TeoriaDosJogos.Models
 
         [JsonProperty("miserie")]
         public string Miserie { get; set; }
+
+        [JsonProperty("orientation")]
+        public string Orientation { get; set; }
     }
 }

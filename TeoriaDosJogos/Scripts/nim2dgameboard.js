@@ -7,6 +7,7 @@
     if(typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 3;
     if (typeof firstLine == "undefined") window.firstLine = parseInt(getParameterByName("firstLine")) || 3;
     if (typeof increaseByLine == "undefined") window.increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
+    if (typeof orientation == "undefined") window.orientation = parseInt(getParameterByName("orientation")) || "a";
     startMenuNim2D();
 }
 
@@ -130,6 +131,7 @@ function checkersPositioner() {
                     this.selected = false;
                     this.color("white");
                     this.destroyed = true;
+                    this.status = "e";
                 }
             })
             .bind("Undelete", function() {
@@ -137,6 +139,7 @@ function checkersPositioner() {
                     this.selected = false;
                     this.color("black");
                     this.destroyed = false;
+                    this.status = "p";
                 }
             })
             .bind("Select", function () {
@@ -175,6 +178,7 @@ function checkersPositioner() {
             checker["row"] = rows;
             checker["selected"] = false;
             checker["destroyed"] = false;
+            checker["status"] = "p";
 
             checkerBoard[checkerBoardIndex].push(checker);
             x = x + varianceX;
@@ -262,10 +266,36 @@ function deleteCheckers(line, row, line2, row2) {
         var options = {};
         options["level"] = level;
         options["miserie"] = miserie;
-        queryGameboard(getNim2DBoard(), "Nim2D", options, setNim2DBoard);
+        if (orientation == "a") options["orientation"] = "b";
+        else if (orientation == "b") options["orientation"] = "a";
+        queryGameboard(getPrologNimBoard(), "Nim2D", options, setNim2DBoard);
     }
 }
 
+function getPrologNimBoard() {
+    var prologNim2DBoard = [];
+    var boardSize = firstLine + increaseByLine * (lines - 1);
+    var iterator = 0;
+    for (var i = 0; i < boardSize; i++) {
+        prologNim2DBoard.push([]);
+        if (i + 1 == firstLine + increaseByLine * iterator) {
+            for (var j = 0; j < boardSize; j++) {
+                if (j < checkerBoard[checkerBoard.length - 2 - iterator].length) {
+                    prologNim2DBoard[i].push(checkerBoard[lines - 1 - iterator][j].status);
+                } else {
+                    prologNim2DBoard[i].push('n');
+                }
+            }
+            iterator++;
+        } else {
+            for (var j = 0; j < boardSize; j++) {
+                prologNim2DBoard[i].push('n');
+            }
+        }
+    }
+
+    return prologNim2DBoard;
+}
 
 function getNim2DBoard() {
     var simpleNim2DBoard = [];
@@ -275,10 +305,34 @@ function getNim2DBoard() {
             simpleNim2DBoard[i].push(checkerBoard[i][j].destroyed);
         }
     }
+
     return simpleNim2DBoard;
 }
 
-function setNim2DBoard(simpleNim2DBoard) {
+function NimPrologToBoard(prologNim2DBoard) {
+    if (prologNim2DBoard == "true" || prologNim2DBoard == "false") return prologNim2DBoard;
+    else {
+        var simpleNim2DBoard = [];
+        var boardSize = firstLine + increaseByLine * (lines - 1);
+        var iterator = 0;
+        for (var i = 0; i < boardSize; i++) {
+            if (i + 1 == firstLine + increaseByLine * iterator) {
+                simpleNim2DLine = [];
+                for(var j = 0; j < boardSize; j++) {
+                    if(NimPrologToBoard[i][j] == "p") simpleNim2DLine.push(false);
+                    else if(NimPrologToBoard[i][j] == "e") simpleNim2DLine.push(true);
+                }
+
+                simplesNim2DBoard.unshift(simpleNim2DLine);
+            }
+        }
+
+        return simpleNim2DBoard;
+    }
+}
+
+function setNim2DBoard(prologNim2DBoard) {
+    simpleNim2DBoard = NimPrologToBoard(prologNim2DBoard);
     if (simpleNim2DBoard == "true") renderNim2DGameOver("Player won!");
     else if (simpleNim2DBoard == "false") renderNim2DGameOver("Computer won!");
     for (var i = 0; i < simpleNim2DBoard.length; i++) {

@@ -17,6 +17,7 @@ function queryGameboard(gameboard, game, options, callback) {
 
     if (options.level != undefined) setData["level"] = options.level;
     if (options.miserie != undefined) setData["miserie"] = options.miserie;
+    if (options.orientation != undefined) setData["orientation"] = options.orientation;
 
     $.ajax({
         type: 'POST',
@@ -28,6 +29,7 @@ function queryGameboard(gameboard, game, options, callback) {
         },
         success: function (data) {
             if (game == "Domineering") callback(data, options.orientation);
+            else if (game == "Othello") callback(data, options.orientation);
             else if (game == "Nim2D") callback(data);
         }
     });

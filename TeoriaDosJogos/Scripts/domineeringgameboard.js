@@ -1,13 +1,17 @@
 ﻿function setupDomineering() {
     window.domineeringBoard = [];
     window.board = [];
-    window.playerNorth = true;
     window.startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
     window.freeze = false;
     if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 1;
     if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 8;
     if (typeof firstPlayer == "undefined") window.firstPlayer = getParameterByName("firstPlayer") || "Vertical";
     startMenuDomineering();
+}
+
+function playerNorth() {
+    if (firstPlayer == "Vertical") return true;
+    else if(firstPlayer == "Horizontal") return false;
 }
 
 function startMenuDomineering() {
@@ -99,7 +103,8 @@ function initDomineeringGame() {
         freeze = true;
         var options = {};
         options["level"] = level;
-        options["orientation"] = "north";
+        if (firstPlayer == "Vertical") options["orientation"] = "h";
+        else if (firstPlayer == "Horizontal") options["orientation"] = "v";
         queryGameboard(getDomineeringBoard(), "Domineering", options, setDomineeringBoard);
     };
 }
@@ -171,13 +176,13 @@ function domineeringBoardRender() {
 
 function dominoColor(line, row, color) {
     if (!domineeringBoard[line][row].populated) {
-        if (playerNorth) {
-            if (!domineeringBoard[line - 1][row].populated) {
+        if (playerNorth()) {
+            if (line > 0 && !domineeringBoard[line - 1][row].populated) {
                 domineeringBoard[line][row].trigger("Coloring", new Array(color));
                 domineeringBoard[line - 1][row].trigger("Coloring", new Array(color));
             }
         } else {
-            if (!domineeringBoard[line][row + 1].populated) {
+            if (row < lines - 1 && !domineeringBoard[line][row + 1].populated) {
                 domineeringBoard[line][row].trigger("Coloring", new Array(color));
                 domineeringBoard[line][row + 1].trigger("Coloring", new Array(color));
             }
@@ -188,16 +193,17 @@ function dominoColor(line, row, color) {
 function dominoPlacer(line, row) { 
     var color;
     if (!domineeringBoard[line][row].populated) {
-        if (playerNorth) {
+        if (playerNorth()) {
             color = "blue";
             if (!domineeringBoard[line - 1][row].populated) {
                 domineeringBoard[line][row].trigger("Populate", new Array(color));
                 domineeringBoard[line - 1][row].trigger("Populate", new Array(color));
-                //playerNorth = !playerNorth;
+                //playerNorth() = !playerNorth();
                 freeze = true;
                 var options = {};
                 options["level"] = level;
-                options["orientation"] = "north";
+                if (firstPlayer == "Vertical") options["orientation"] = "h";
+                else if (firstPlayer == "Horizontal") options["orientation"] = "v";
                 queryGameboard(getDomineeringBoard(), "Domineering", options, setDomineeringBoard);
             }
         } else {
@@ -209,8 +215,9 @@ function dominoPlacer(line, row) {
                 freeze = true;
                 var options = {};
                 options["level"] = level;
-                options["orientation"] = "east";
-                if (temporary == 0) queryGameboard(getDomineeringBoard(), "Domineering", options, setDomineeringBoard);
+                if (firstPlayer == "Vertical") options["orientation"] = "h";
+                else if (firstPlayer == "Horizontal") options["orientation"] = "v";
+                queryGameboard(getDomineeringBoard(), "Domineering", options, setDomineeringBoard);
             }
         }
     }
@@ -241,8 +248,6 @@ function setDomineeringBoard(simpleDomineeringBoard, playerTurn) {
         }
     }
 
-    if (playerTurn == "north") playerNorth = true;
-    else if (playerTurn == "east") playerNorth = false;
     freeze = false;
 }
     
