@@ -3,9 +3,9 @@
     window.board = [];
     window.startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
     window.freeze = false;
-    if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 1;
-    if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 8;
-    if (typeof firstPlayer == "undefined") window.firstPlayer = getParameterByName("firstPlayer") || "Vertical";
+    window.level = parseInt(getParameterByName("level")) || 1;
+    window.lines = parseInt(getParameterByName("lines")) || 8;
+    window.firstPlayer = getParameterByName("firstPlayer") || "Vertical";
     startMenuDomineering();
 }
 

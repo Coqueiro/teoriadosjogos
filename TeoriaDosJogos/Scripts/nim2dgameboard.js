@@ -1,13 +1,14 @@
 ﻿function setupNim2D() {
     window.checkerBoard = [];
     window.board = [];
-    window.varianceX = 60, varianceY = 60, startX = 10, startY = 10, w = 40, h = 40;
-    if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 0;
-    if (typeof miserie == "undefined") window.miserie = (getParameterByName("miserie") === "true") || "Normal";
-    if(typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 3;
-    if (typeof firstLine == "undefined") window.firstLine = parseInt(getParameterByName("firstLine")) || 3;
-    if (typeof increaseByLine == "undefined") window.increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
-    if (typeof orientation == "undefined") window.orientation = parseInt(getParameterByName("orientation")) || "a";
+    window.freeze = false;
+    window.varianceX = 60, varianceY = 60, startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
+    window.level = parseInt(getParameterByName("level")) || 1;
+    window.miserie = (getParameterByName("miserie") === "true") || "Normal";
+    window.lines = parseInt(getParameterByName("lines")) || 3;
+    window.firstLine = parseInt(getParameterByName("firstLine")) || 3;
+    window.increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
+    window.firstPlayer = getParameterByName("firstPlayer") || "Primeiro";
     startMenuNim2D();
 }
 
@@ -21,7 +22,7 @@ function startMenuNim2D() {
 
 function renderNim2DStartMenu() {
     var menuX = 200;
-    var menuY = 250;
+    var menuY = 300;
 
     Crafty.e("2D, Canvas, Color")
     .attr({ x: startX, y: startY, w: board[0] * w, h: board.length * h })
@@ -51,7 +52,7 @@ function renderNim2DStartMenu() {
 
 function renderNim2DGameOver(message) {
     Crafty.e("2D, Canvas, Color")
-    .attr({ x: startX, y: startY, w: board[0] * (w + contourLength) + contourLength, h: board.length * (h + contourLength) + contourLength })
+    .attr({ x: startX, y: startY, w: (firstLine + (lines - 1) * increaseByLine) * (w + contourLength) + contourLength, h: board.length * (h + contourLength) + contourLength })
     .color("white", 0.7)
     .bind("DestroyGameOver", function () { this.destroy() });
 
@@ -95,6 +96,8 @@ function renderNim2DSelectors() {
     createArraySelector("Primeira Linha", "firstLine", spacing, [1, 2, 3, 4, 5], 2, selectorX, selectorY);
     selectorY = selectorY + height;
     createArraySelector("Aumento por Linha", "increaseByLine", spacing, [1, 2, 3], 1, selectorX, selectorY);
+    selectorY = selectorY + height;
+    createArraySelector("Player", "firstPlayer", spacing, ["Primeiro", "Segundo"], 0, selectorX, selectorY);
 }
 
 function initNim2DGame() {
@@ -102,6 +105,14 @@ function initNim2DGame() {
     Crafty.trigger("DestroySelector");
     nim2DBoardGenerator(lines, firstLine, increaseByLine);
     checkersPositioner();
+    if (firstPlayer == "Segundo") {
+        freeze = true;
+        var options = {};
+        options["level"] = level;
+        options["miserie"] = miserie;
+        options["orientation"] = "a";
+        queryGameboard(getPrologNimBoard(), "Nim2D", options, setNim2DBoard);
+    };
 }
 
 function nim2DBoardGenerator(lines, firstLine, factorUp) {
@@ -155,7 +166,7 @@ function checkersPositioner() {
                 }
             })
             .bind("MouseUp", function (mouseEvent) {
-                if(!this.destroyed) {
+                if(!this.destroyed && freeze == false) {
                     if (mouseEvent.mouseButton === Crafty.mouseButtons.RIGHT) {
                         this.trigger("Unselect");
                     } else if (this.selected == false) {
@@ -266,8 +277,9 @@ function deleteCheckers(line, row, line2, row2) {
         var options = {};
         options["level"] = level;
         options["miserie"] = miserie;
-        if (orientation == "a") options["orientation"] = "b";
-        else if (orientation == "b") options["orientation"] = "a";
+        if (firstPlayer == "Primeiro") options["orientation"] = "b";
+        else if (firstPlayer == "Segundo") options["orientation"] = "a";
+        freeze = true;
         queryGameboard(getPrologNimBoard(), "Nim2D", options, setNim2DBoard);
     }
 }
@@ -319,11 +331,12 @@ function NimPrologToBoard(prologNim2DBoard) {
             if (i + 1 == firstLine + increaseByLine * iterator) {
                 simpleNim2DLine = [];
                 for(var j = 0; j < boardSize; j++) {
-                    if(NimPrologToBoard[i][j] == "p") simpleNim2DLine.push(false);
-                    else if(NimPrologToBoard[i][j] == "e") simpleNim2DLine.push(true);
+                    if (prologNim2DBoard[i][j] == "p") simpleNim2DLine.push(false);
+                    else if (prologNim2DBoard[i][j] == "e") simpleNim2DLine.push(true);
                 }
 
-                simplesNim2DBoard.unshift(simpleNim2DLine);
+                iterator++;
+                simpleNim2DBoard.unshift(simpleNim2DLine);
             }
         }
 
@@ -333,13 +346,17 @@ function NimPrologToBoard(prologNim2DBoard) {
 
 function setNim2DBoard(prologNim2DBoard) {
     simpleNim2DBoard = NimPrologToBoard(prologNim2DBoard);
-    if (simpleNim2DBoard == "true") renderNim2DGameOver("Player won!");
-    else if (simpleNim2DBoard == "false") renderNim2DGameOver("Computer won!");
-    for (var i = 0; i < simpleNim2DBoard.length; i++) {
-        for (var j = 0; j < simpleNim2DBoard[i].length; j++) {
-            if (simpleNim2DBoard[i][j] == false) checkerBoard[i][j].trigger("Undelete");
-            else if (simpleNim2DBoard[i][j] == true) checkerBoard[i][j].trigger("Delete");
+    if (simpleNim2DBoard == "true") renderNim2DGameOver("Computer won!");
+    else if (simpleNim2DBoard == "false") renderNim2DGameOver("Player won!");
+    else {
+        for (var i = 0; i < simpleNim2DBoard.length; i++) {
+            for (var j = 0; j < simpleNim2DBoard[i].length; j++) {
+                if (simpleNim2DBoard[i][j] == false) checkerBoard[i][j].trigger("Undelete");
+                else if (simpleNim2DBoard[i][j] == true) checkerBoard[i][j].trigger("Delete");
+            }
         }
     }
+
+    freeze = false;
 }
     

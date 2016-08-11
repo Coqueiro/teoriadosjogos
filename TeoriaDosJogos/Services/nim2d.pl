@@ -11,6 +11,7 @@
 % computerB. - IA joga em segundo
 % playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2). - Movimento do Jogador (P1=(X1,Y1) e P2=(X2,Y2), P1 superior/esquerda de P2)
 % playComputer(NewBoard, Sign, Board, Level, Victory, Defeat). - Movimento da IA
+% playComputer(NewBoard, BoardSize, Sign, Board, Level, Victory, Defeat). - Movimento da IA passando tamanho do tabuleiro
 %
 % Tabuleiro inicial (exemplo)
 %
@@ -22,8 +23,7 @@
 % 5|P|P|P|P|P|-|
 % 6|P|P|P|P|P|P|
 %
-% Sign: 'a' primeiro jogador, 'b' segundo jogador
-% Board: 'p' na matriz identifica peça, 'n' identifica linha inalcançável e 'e' é peça retirada
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -145,13 +145,17 @@ moves(Turn/Board, BoardSize, [B|Bs]) :-
 %%%%%%%%%%%%%%%%%%%%%%  PREDICADOS CENTRAIS DO JOGO  %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Define tamanho do tabuleiro
+setBoardSize(BoardSize) :-
+ assert(boardSize(BoardSize)).
+
 % Jogador começa
-computerV :-
- assert(min2Move(h/_)),assert(max2Move(v/_)).
+computerA :-
+ assert(min2Move(b/_)),assert(max2Move(a/_)).
 
 % Computador começa
-computerH :-
- assert(min2Move(v/_)),assert(max2Move(h/_)).
+computerB :-
+ assert(min2Move(a/_)),assert(max2Move(b/_)).
 
 % Captura o próximo movimento
 playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2) :-
@@ -159,6 +163,18 @@ playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2) :-
  move(Board, BoardSize, Sign, X1, Y1, X2, Y2, NewBoard),!.% Jogada
 
 % Movimento do Computador
+playComputer(NewBoard, BoardSize, Sign, Board, Level, Victory, Defeat) :-
+ (
+  validMove(Board, BoardSize, Sign, _),! 
+  -> 
+  Defeat = false,
+  moveComputer(NewBoard, Sign, Board, Level),!,
+  victoryBoard(NewBoard, Sign, Victory),!
+  ; 
+  Defeat = true,
+  NewBoard = Board,
+  Victory = false
+ ),!.
 playComputer(NewBoard, Sign, Board, Level, Victory, Defeat) :-
  boardSize(BoardSize),
  (

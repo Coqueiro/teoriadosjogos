@@ -20,6 +20,13 @@ namespace TeoriaDosJogos.Services
             else return "";
         }
 
+        public static string ComputerName(string game)
+        {
+            if (game == "Domineering") return "computerH";
+            else if (game == "Nim2D") return "computerA";
+            else return "";
+        }
+
         public static string IAPlay(string gameboard, GameboardModel gameboardModel)
         {
             var projectPath = System.AppDomain.CurrentDomain.BaseDirectory;
@@ -32,7 +39,8 @@ namespace TeoriaDosJogos.Services
             }
 
             var answer = "";
-            using (PlQuery q = new PlQuery("computerH, playComputer(NewBoard, " + gameboardModel.Orientation + ", b(" + gameboard + "), " + gameboardModel.Level + ", Victory, Defeat)"))
+            var query = ComputerName(gameboardModel.Game) + ", setBoardSize(" + gameboardModel.Gameboard.Length + "), playComputer(NewBoard, " + gameboardModel.Orientation + ", b(" + gameboard + "), " + gameboardModel.Level + ", Victory, Defeat)";
+            using (PlQuery q = new PlQuery(query))
             {
                 foreach (PlQueryVariables v in q.SolutionVariables)
                 {
