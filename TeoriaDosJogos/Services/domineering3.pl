@@ -226,13 +226,12 @@ loopAlphaBeta(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth) :-
   ;
   turnNumber(TurnNumber),
   TurnNumber >= BoardSize - 3,
-  staticValuation(Pos, BoardSize, Val,_),!			% MinMax
-  ;
-  turnNumber(TurnNumber),
-  TurnNumber < BoardSize - 3,
-  TurnNumber >= 2,
   staticValuation(Pos, BoardSize, Val),!			% MinMax
   ;
+  turnNumber(TurnNumber),
+  TurnNumber >= 2,
+  staticValuation(Pos, BoardSize, Val),!			% MinMax
+  ;  
   dinamicValuation(Pos, BoardSize, Val, BDepth),!		% Monte Carlo
  ).								% Retorno da Posição
 
@@ -282,16 +281,6 @@ staticValuation(Turn/Board, BoardSize, Res) :-
   Res is ResBonus
  ),!.
 
-staticValuation(Turn/Board, BoardSize, Res, _) :-
- boardBonus(Turn, Board, BoardSize, ResBonus, _),
- (
-  min2Move(Turn/_),
-  Res is - ResBonus
-  ;
-  max2Move(Turn/_),
-  Res is ResBonus
- ),!.
-
 % Heurística
 dinamicValuation(Turn/Board, BoardSize, Res, BDepth) :-
  playRandomLoop(Board, BoardSize, Turn, Wins, Losses, BDepth),
@@ -330,10 +319,6 @@ boardBonus(Turn, Board, BoardSize, Bonus) :-
  enemy(Turn, EnemyTurn),
  countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, BoardSize, 0).
 
-boardBonus(Turn, Board, BoardSize, Bonus, _) :-
- enemy(Turn, EnemyTurn),
- countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, BoardSize, 0, _).
-
 countBonus(_, _, _, _, Bonus, 0, Bonus) :- !.
 countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, Loop, CounterBonus) :-
  incrementalBonusBorder(Turn, Loop, Board, BoardSize, BonusBT),
@@ -344,16 +329,6 @@ countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, Loop, CounterBonus) :-
   CounterBonus 
   + 2*BonusBT - BonusBE 
   + BonusFT - BonusFE,
- NewLoop is Loop - 1,
- countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, NewLoop, NewCounterBonus).
-
-countBonus(_, _, _, _, Bonus, 0, Bonus, _) :- !.
-countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, Loop, CounterBonus, _) :-
- incrementalBonusBorder(Turn, Loop, Board, BoardSize, BonusBT),
- incrementalBonusBorder(EnemyTurn, Loop, Board, BoardSize, BonusBE),
- NewCounterBonus is 
-  CounterBonus 
-  + 2*BonusBT - BonusBE,
  NewLoop is Loop - 1,
  countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, NewLoop, NewCounterBonus).
 
@@ -385,10 +360,27 @@ incrementalBonusBorder(h, Col, Board, BoardSize, Bonus) :-
  ),
  Bonus is BonusA + BonusB.
 
-incrementalBonusField(Sign, Board, BoardSize, _, Bonus, _, _) :-
- moves(Sign/Board, BoardSize, PosList),!,
- length(PosList, Res),
- Bonus is Res.
+incrementalBonusField(_, _, _, _, Bonus, 1, Bonus) :- !.
+incrementalBonusField(v, Board, BoardSize, Col, Bonus, Loop, CounterBonus) :-
+ LineAux is Loop - 1,
+ (
+  findPiece(Board, BoardSize, e, LineAux, Col), findPiece(Board, BoardSize, e, Loop, Col) 
+  -> 
+  BonusAux is 1 ; BonusAux is 0
+ ),
+ NewCounterBonus is CounterBonus + BonusAux,
+ NewLoop is Loop - 1,
+ incrementalBonusField(v, Board, BoardSize, Col, Bonus, NewLoop, NewCounterBonus).
+incrementalBonusField(h, Board, BoardSize, Line, Bonus, Loop, CounterBonus) :-
+ ColAux is Loop - 1,
+ (
+  findPiece(Board, BoardSize, e, Line, ColAux), findPiece(Board, BoardSize, e, Line, Loop) 
+  -> 
+  BonusAux is 1 ; BonusAux is 0
+ ),
+ NewCounterBonus is CounterBonus + BonusAux,
+ NewLoop is Loop - 1,
+ incrementalBonusField(v, Board, BoardSize, Line, Bonus, NewLoop, NewCounterBonus).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  FIM DO PROGRAMA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

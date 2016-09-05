@@ -106,9 +106,6 @@ validateMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2) :-
  ;
  ToL2 is ToL1, 
  ToC2 is ToC1 + 1
- ;
- ToL2 is ToL1, 
- ToC2 is ToC1
  ),
  findPiece(Board, BoardSize, p, ToL2, ToC2),
  ToL2 >= ToC2.

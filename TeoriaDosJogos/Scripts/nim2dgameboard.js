@@ -346,8 +346,8 @@ function NimPrologToBoard(prologNim2DBoard) {
 
 function setNim2DBoard(prologNim2DBoard) {
     simpleNim2DBoard = NimPrologToBoard(prologNim2DBoard);
-    if (simpleNim2DBoard == "true") renderNim2DGameOver("Computer won!");
-    else if (simpleNim2DBoard == "false") renderNim2DGameOver("Player won!");
+    if (simpleNim2DBoard == "false") renderNim2DGameOver("Computer won!");
+    else if (simpleNim2DBoard == "true") renderNim2DGameOver("Player won!");
     else {
         for (var i = 0; i < simpleNim2DBoard.length; i++) {
             for (var j = 0; j < simpleNim2DBoard[i].length; j++) {
