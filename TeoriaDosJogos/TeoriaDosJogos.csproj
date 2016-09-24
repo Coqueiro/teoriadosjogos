@@ -242,7 +242,9 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\domineeringgameboard.js" />
     <Content Include="Scripts\gameselector.js" />
+    <Content Include="Scripts\parametersSelectorEAD.js" />
     <Content Include="Scripts\parametersSelector.js" />
+    <Content Include="Scripts\utilEAD.js" />
     <Content Include="Scripts\util.js" />
     <Content Include="Scripts\othellogameboard.js" />
     <Content Include="Scripts\nimgameboard.js" />
