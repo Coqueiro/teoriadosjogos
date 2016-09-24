@@ -12,7 +12,6 @@ namespace TeoriaDosJogos
         public static void RegisterRoutes(RouteCollection routes)
         {
             //routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-
             routes.MapRoute(
                 name: "DefaultPath",
                 url: "{controller}/{action}/{id}",
