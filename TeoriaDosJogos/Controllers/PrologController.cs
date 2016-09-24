@@ -3,12 +3,14 @@ using System.Web.Mvc;
 using TeoriaDosJogos.Helpers;
 using TeoriaDosJogos.Models;
 using TeoriaDosJogos.Services;
+using TeoriaDosJogos.Filters;
 
 namespace TeoriaDosJogos.Controllers
 {
     public class PrologController : Controller
     {
         [HttpPost]
+        [AllowCors]
         [ValidateInput(false)]
         public string GameIntel(GameboardModel gameboardModel)
         {
