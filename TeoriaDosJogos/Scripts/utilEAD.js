@@ -21,7 +21,7 @@ function queryGameboard(gameboard, game, options, callback) {
 
     $.ajax({
         type: 'POST',
-        url: '/Prolog/GameIntel',
+        url: 'http://localhost:58416/Prolog/GameIntel',
         data: setData,
         dataType: "json",
         xhrFields: {

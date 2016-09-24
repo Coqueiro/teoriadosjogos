@@ -9,6 +9,7 @@ namespace TeoriaDosJogos.Controllers
     public class PrologController : Controller
     {
         [HttpPost]
+        [ValidateInput(false)]
         public string GameIntel(GameboardModel gameboardModel)
         {
             var gameboardString = PrologUtils.GameboardToString(gameboardModel.Gameboard);
