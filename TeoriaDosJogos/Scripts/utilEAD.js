@@ -24,9 +24,6 @@ function queryGameboard(gameboard, game, options, callback) {
         url: 'http://localhost:58416/Prolog/GameIntel',
         data: setData,
         dataType: "json",
-        //xhrFields: {
-        //    withCredentials: true
-        //},
         success: function (data) {
             if (game == "Domineering") callback(data, options.orientation);
             else if (game == "Othello") callback(data, options.orientation);
