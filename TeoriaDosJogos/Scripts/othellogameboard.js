@@ -5,6 +5,7 @@
     window.board = [];
     window.playerBlack = true;
     window.startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
+    window.freeze = false;
     window.insideLimit = 5;
     window.blackColor = "blue";
     window.whiteColor = "yellow";
@@ -47,6 +48,37 @@ function renderOthelloStartMenu() {
     .text("Start game!")
     .textColor("black")
     .bind("DestroyMenu", function () { this.destroy() });
+}
+
+function renderOthelloGameOver(message) {
+    Crafty.e("2D, Canvas, Color")
+    .attr({ x: startX, y: startY, w: board[0] * (w + contourLength) + contourLength, h: board.length * (h + contourLength) + contourLength })
+    .color("white", 0.7)
+    .bind("DestroyGameOver", function () { this.destroy() });
+
+    Crafty.e("2D, Canvas, Text")
+    .attr({ x: 200, y: 200 })
+    .text(message)
+    .textColor("black")
+    .bind("DestroyGameOver", function () { this.destroy() });
+
+    Crafty.e("2D, Canvas, Color, Mouse")
+    .attr({ x: 200, y: 220, w: 70, h: 30 })
+    .color("orange")
+    .bind("MouseUp", function () {
+        setupOthello();
+        Crafty.trigger("DestroyGameOver");
+        Crafty.trigger("Terminate");
+    })
+    .bind("MouseOver", function () { this.color("red") })
+    .bind("MouseOut", function () { this.color("orange") })
+    .bind("DestroyGameOver", function () { this.destroy() });
+
+    Crafty.e("2D, Canvas, Text")
+    .attr({ x: 210, y: 230 })
+    .text("Go to Menu!")
+    .textColor("black")
+    .bind("DestroyGameOver", function () { this.destroy() });
 }
 
 function renderOthelloSelectors() {
@@ -98,34 +130,41 @@ function othelloBoardRender() {
             .bind("Delete", function () { this.destroy() })
             .bind("Populate", function () {
                 if (playerBlack) {
-                    pieces[this.line][this.row].trigger("Populate", new Array(blackColor));
+                    pieces[this.line][this.row].trigger("Populate", new Array(blackColor, "b"));
                     this.player = blackColor;
+                    this.playerDirection = "b";
                 }
                 else {
-                    pieces[this.line][this.row].trigger("Populate", new Array(whiteColor));
+                    pieces[this.line][this.row].trigger("Populate", new Array(whiteColor, "w"));
                     this.player = whiteColor;
+                    this.playerDirection = "w";
                 }
                 this.populated = true;
             })
             .bind("PopulateByColor", function (args) {
-                pieces[this.line][this.row].trigger("Populate", new Array(args[0]));
-                this.player = args[0];
+                this.player = "";
+                var direction = args[0];
+                if (args[0] == "b") this.player = blackColor;
+                else if (args[0] == "w") this.player = whiteColor;
+                this.playerDirection = direction;
+                pieces[this.line][this.row].trigger("Populate", new Array(this.player, direction));
             })
-            .bind("MouseUp", function () { spacePlacer(this.line, this.row, "") })
+            .bind("MouseUp", function () { if (!freeze) spacePlacer(this.line, this.row, "") })
             .bind("Coloring", function (args) {
                 pieces[this.line][this.row].trigger("Coloring", args);
             })
             .bind("MouseOver", function (){
-                spacePlacer(this.line, this.row, "red");
+                if (!freeze) spacePlacer(this.line, this.row, "red");
             })
             .bind("MouseOut", function () {
-                spacePlacer(this.line, this.row, "white");
+                if (!freeze) spacePlacer(this.line, this.row, "white");
             });
 
             space["line"] = lines;
             space["row"] = rows;
             space["populated"] = false;
             space["player"] = "";
+            space["playerDirection"] = "e";
             
             piece = Crafty.e("2D, Canvas, Color")
             .attr({ x: x + insideLimit, y: y + insideLimit, w: w - 2*insideLimit, h: h - 2*insideLimit })
@@ -135,12 +174,14 @@ function othelloBoardRender() {
                 if (args[0] == "") this.color("white");
                 else this.color(args[0]);
                 this["player"] = args[0];
+                this["playerDirection"] = args[1];
             })
             .bind("Coloring", function (args) {
                 this.color(args[0]);
             });
 
             piece["player"] = "";
+            piece["playerDirection"] = "e";
 
             pieces[lines].push(piece);
 
@@ -154,17 +195,21 @@ function othelloBoardRender() {
         lines++;
 
         if (lines == board.length) {
-            pieces[Math.round(lines / 2) - 1][Math.round(rows / 2) - 1].trigger("Populate", new Array(whiteColor));
+            pieces[Math.round(lines / 2) - 1][Math.round(rows / 2) - 1].trigger("Populate", new Array(whiteColor, "w"));
             othelloBoard[Math.round(lines / 2) - 1][Math.round(rows / 2) - 1].player = whiteColor;
+            othelloBoard[Math.round(lines / 2) - 1][Math.round(rows / 2) - 1].playerDirection = "w";
 
-            pieces[Math.round(lines / 2)][Math.round(rows / 2)].trigger("Populate", new Array(whiteColor));
+            pieces[Math.round(lines / 2)][Math.round(rows / 2)].trigger("Populate", new Array(whiteColor, "w"));
             othelloBoard[Math.round(lines / 2)][Math.round(rows / 2)].player = whiteColor;
+            othelloBoard[Math.round(lines / 2)][Math.round(rows / 2)].playerDirection = "w";
 
-            pieces[Math.round(lines / 2) - 1][Math.round(rows / 2)].trigger("Populate", new Array(blackColor));
+            pieces[Math.round(lines / 2) - 1][Math.round(rows / 2)].trigger("Populate", new Array(blackColor, "b"));
             othelloBoard[Math.round(lines / 2) - 1][Math.round(rows / 2)].player = blackColor;
+            othelloBoard[Math.round(lines / 2) - 1][Math.round(rows / 2)].playerDirection = "b";
 
-            pieces[Math.round(lines / 2)][Math.round(rows / 2) - 1].trigger("Populate", new Array(blackColor));
+            pieces[Math.round(lines / 2)][Math.round(rows / 2) - 1].trigger("Populate", new Array(blackColor, "b"));
             othelloBoard[Math.round(lines / 2)][Math.round(rows / 2) - 1].player = blackColor;
+            othelloBoard[Math.round(lines / 2)][Math.round(rows / 2) - 1].playerDirection = "b";
         }
     }
 }
@@ -263,9 +308,12 @@ function spacePlacer(line, row, color) {
 
     if (possiblePlay) {
         if (color == "") {
-            playerBlack = !playerBlack;
+            freeze = true;
             var options = {};
             options["level"] = level;
+            if (playerBlack) options["orientation"] = "w";
+            else if (!playerBlack) options["orientation"] = "b";
+            playerBlack = !playerBlack;
             queryGameboard(getOthelloBoard(), "Othello", options, setOthelloBoard);
         }
         else {
@@ -299,19 +347,24 @@ function getOthelloBoard() {
     for (var i = 0; i < othelloBoard.length - 1; i++) {
         simpleOthelloBoard.push([]);
         for (var j = 0; j < othelloBoard[i].length; j++) {
-            simpleOthelloBoard[i].push(othelloBoard[i][j].player);
+            simpleOthelloBoard[i].push(othelloBoard[i][j].playerDirection);
         }
     }
     return simpleOthelloBoard;
 }
 
 function setOthelloBoard(simpleOthelloBoard, playerTurn) {
-    for (var i = 0; i < simpleOthelloBoard.length; i++) {
-        for (var j = 0; j < simpleOthelloBoard[i].length; j++) {
-            othelloBoard[i][j].trigger("PopulateByColor", new Array(simpleOthelloBoard[i][j]));
+    if (simpleOthelloBoard == "true") renderOthelloGameOver("Computer won!");
+    else if (simpleOthelloBoard == "false") renderOthelloGameOver("Player won!");
+    else {
+        for (var i = 0; i < simpleOthelloBoard.length; i++) {
+            for (var j = 0; j < simpleOthelloBoard[i].length; j++) {
+                othelloBoard[i][j].trigger("PopulateByColor", new Array(simpleOthelloBoard[i][j]));
+            }
         }
     }
-    if (playerTurn == "black") playerBlack = true;
-    else if (playerTurn == "white") playerBlack = false;
+
+    freeze = false;
 }
+
 

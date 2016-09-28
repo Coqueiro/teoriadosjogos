@@ -3,11 +3,12 @@
     window.board = [];
     window.freeze = false;
     window.varianceX = 40, varianceY = 50, startX = 10, startY = 10, w = 20, h = 40;
-    if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 0;
-    if (typeof miserie == "undefined") window.miserie = (getParameterByName("miserie") === "true") || "Normal";
-    if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 3;
-    if (typeof firstLine == "undefined") window.firstLine = parseInt(getParameterByName("firstLine")) || 3;
-    if (typeof increaseByLine == "undefined") window.increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
+    window.level = parseInt(getParameterByName("level")) || 1;
+    window.miserie = (getParameterByName("miserie") === "true") || "Normal";
+    window.lines = parseInt(getParameterByName("lines")) || 3;
+    window.firstLine = parseInt(getParameterByName("firstLine")) || 3;
+    window.increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
+    window.firstPlayer = getParameterByName("firstPlayer") || "Primeiro";
     startMenuNim();
 }
 
@@ -49,6 +50,37 @@ function renderNimStartMenu() {
     .bind("DestroyMenu", function () { this.destroy() });
 }
 
+function renderNimGameOver(message) {
+    Crafty.e("2D, Canvas, Color")
+    .attr({ x: startX, y: startY, w: board[0] * (w + contourLength) + contourLength, h: board.length * (h + contourLength) + contourLength })
+    .color("white", 0.7)
+    .bind("DestroyGameOver", function () { this.destroy() });
+
+    Crafty.e("2D, Canvas, Text")
+    .attr({ x: 200, y: 200 })
+    .text(message)
+    .textColor("black")
+    .bind("DestroyGameOver", function () { this.destroy() });
+
+    Crafty.e("2D, Canvas, Color, Mouse")
+    .attr({ x: 200, y: 220, w: 70, h: 30 })
+    .color("orange")
+    .bind("MouseUp", function () {
+        setupNim();
+        Crafty.trigger("DestroyGameOver");
+        Crafty.trigger("Terminate");
+    })
+    .bind("MouseOver", function () { this.color("red") })
+    .bind("MouseOut", function () { this.color("orange") })
+    .bind("DestroyGameOver", function () { this.destroy() });
+
+    Crafty.e("2D, Canvas, Text")
+    .attr({ x: 210, y: 230 })
+    .text("Go to Menu!")
+    .textColor("black")
+    .bind("DestroyGameOver", function () { this.destroy() });
+}
+
 function renderNimSelectors() {
     var selectorX = 50;
     var selectorY = 50;
@@ -64,6 +96,8 @@ function renderNimSelectors() {
     createArraySelector("Primeira Linha", "firstLine", spacing, [1, 2, 3, 4, 5], 2, selectorX, selectorY);
     selectorY = selectorY + height;
     createArraySelector("Aumento por Linha", "increaseByLine", spacing, [1, 2, 3], 1, selectorX, selectorY);
+    selectorY = selectorY + height;
+    createArraySelector("Player", "firstPlayer", spacing, ["Primeiro", "Segundo"], 0, selectorX, selectorY);
 }
 
 function initNimGame() {
@@ -98,6 +132,7 @@ function sticksPositioner() {
             .bind("Delete", function () {
                 this.color("white");
                 this.destroyed = true;
+                this.status = "e";
             })
             .bind("Undelete", function () {
                 this.color("black");
@@ -108,6 +143,7 @@ function sticksPositioner() {
             stick["line"] = lines;
             stick["row"] = rows;
             stick["destroyed"] = false;
+            checker["status"] = "p";
 
             stickBoard[stickBoardIndex].push(stick);
             x = x + varianceX;
@@ -132,7 +168,38 @@ function deleteSticks(line, row) {
         }
     }
 
-    queryGameboard(getNimBoard(), "Nim");
+    var options = {};
+    options["level"] = level;
+    options["miserie"] = miserie;
+    if (firstPlayer == "Primeiro") options["orientation"] = "b";
+    else if (firstPlayer == "Segundo") options["orientation"] = "a";
+    freeze = true;
+    queryGameboard(getPrologNimBoard(), "Nim", options, setNimBoard);
+}
+
+function getPrologNimBoard() {
+    var prologNimBoard = [];
+    var boardSize = firstLine + increaseByLine * (lines - 1);
+    var iterator = 0;
+    for (var i = 0; i < boardSize; i++) {
+        prologNimBoard.push([]);
+        if (i + 1 == firstLine + increaseByLine * iterator) {
+            for (var j = 0; j < boardSize; j++) {
+                if (j < stickBoard[stickBoard.length - 2 - iterator].length) {
+                    prologNimBoard[i].push(stickBoard[lines - 1 - iterator][j].status);
+                } else {
+                    prologNimBoard[i].push('n');
+                }
+            }
+            iterator++;
+        } else {
+            for (var j = 0; j < boardSize; j++) {
+                prologNimBoard[i].push('n');
+            }
+        }
+    }
+
+    return prologNimBoard;
 }
 
 function getNimBoard() {
@@ -146,11 +213,18 @@ function getNimBoard() {
     return simpleNimBoard;
 }
 
-function setNimBoard(simpleNimBoard) {
-    for (var i = 0; i < simpleNimBoard.length; i++) {
-        for (var j = 0; j < simpleNimBoard[i].length; j++) {
-            if (simpleNimBoard[i][j] == false) stickBoard[i][j].trigger("Undelete");
-            else if (simpleNimBoard[i][j] == true) stickBoard[i][j].trigger("Delete");
+function setNimBoard(prologNimBoard) {
+    simpleNimBoard = NimPrologToBoard(prologNim2DBoard);
+    if (simpleNimBoard == "false") renderNimGameOver("Computer won!");
+    else if (simpleNimBoard == "true") renderNimGameOver("Player won!");
+    else {
+        for (var i = 0; i < simpleNimBoard.length; i++) {
+            for (var j = 0; j < simpleNimBoard[i].length; j++) {
+                if (simpleNimBoard[i][j] == false) stickBoard[i][j].trigger("Undelete");
+                else if (simpleNimBoard[i][j] == true) stickBoard[i][j].trigger("Delete");
+            }
         }
     }
+
+    freeze = false;
 }
