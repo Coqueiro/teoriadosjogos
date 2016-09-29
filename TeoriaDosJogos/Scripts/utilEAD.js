@@ -28,6 +28,7 @@ function queryGameboard(gameboard, game, options, callback) {
             if (game == "Domineering") callback(data, options.orientation);
             else if (game == "Othello") callback(data, options.orientation);
             else if (game == "Nim2D") callback(data);
+            else if (game == "Nim") callback(data);
         }
     });
 }
