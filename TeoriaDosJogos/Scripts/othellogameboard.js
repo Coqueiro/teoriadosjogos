@@ -9,9 +9,9 @@
     window.insideLimit = 5;
     window.blackColor = "blue";
     window.whiteColor = "yellow";
-    if (typeof level == "undefined") window.level = parseInt(getParameterByName("level")) || 0;
-    if (typeof lines == "undefined") window.lines = parseInt(getParameterByName("lines")) || 8;
-    if (typeof rows == "undefined") window.rows = parseInt(getParameterByName("rows")) || 8;
+    window.level = parseInt(getParameterByName("level")) || 1;
+    window.lines = parseInt(getParameterByName("lines")) || 8;
+    window.rows = parseInt(getParameterByName("rows")) || 8;
     startMenuOthello();
 }
 
@@ -116,7 +116,8 @@ function othelloBoardRender() {
 
     Crafty.e("2D, Canvas, Color")
     .attr({ x: startX, y: startY, w: board[0] * (w + contourLength) + contourLength, h: board.length * (h + contourLength) + contourLength })
-    .color("black");
+    .color("black")
+    .bind("Terminate", function() {this.destroy() });
 
     while (lines <= board.length) {
         var x = startX + contourLength;
@@ -127,6 +128,7 @@ function othelloBoardRender() {
             space = Crafty.e("2D, Canvas, Color, Mouse")
             .attr({ x: x, y: y, w: w, h: h })
             .color("white")
+            .bind("Terminate", function () { this.destroy() })
             .bind("Delete", function () { this.destroy() })
             .bind("Populate", function () {
                 if (playerBlack) {
@@ -169,19 +171,24 @@ function othelloBoardRender() {
             piece = Crafty.e("2D, Canvas, Color")
             .attr({ x: x + insideLimit, y: y + insideLimit, w: w - 2*insideLimit, h: h - 2*insideLimit })
             .color("white")
+            .bind("Terminate", function () { this.destroy() })
             .bind("Delete", function () { this.destroy() })
             .bind("Populate", function (args) {
                 if (args[0] == "") this.color("white");
-                else this.color(args[0]);
-                this["player"] = args[0];
-                this["playerDirection"] = args[1];
+                else {
+                    this.color(args[0]);
+                    this["player"] = args[0];
+                    this["playerDirection"] = args[1];
+                    this["populated"] = true;
+                }
             })
             .bind("Coloring", function (args) {
-                this.color(args[0]);
+                if(!this.populated) this.color(args[0]);
             });
 
             piece["player"] = "";
             piece["playerDirection"] = "e";
+            piece["populated"] = false;
 
             pieces[lines].push(piece);
 
@@ -313,7 +320,6 @@ function spacePlacer(line, row, color) {
             options["level"] = level;
             if (playerBlack) options["orientation"] = "w";
             else if (!playerBlack) options["orientation"] = "b";
-            playerBlack = !playerBlack;
             queryGameboard(getOthelloBoard(), "Othello", options, setOthelloBoard);
         }
         else {

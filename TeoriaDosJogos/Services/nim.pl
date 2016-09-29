@@ -1,28 +1,27 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Author: Robinson Callou
-% Date: 04/07/2016
+% Date: 11/05/2016
 %
-% Othello (Reversi) modelo Jogador Vs IA com múltiplas dificuldades
+% Nim2D modelo Jogador Vs IA com múltiplas dificuldades
 % Indicação: 2-Principiante, 3-Amador, 4-intermediario, 5-Avançado, 6-Mestre
 %
 % setBoardSize(BoardSize). - Define tamanho do tabuleiro
-% computerW. - IA joga com as brancas
-% computerB. - IA joga com as pretas
-% playHuman(NewBoard, Sign, Board, X, Y). - Movimento do Jogador (P=(X,Y))
+% computerA. - IA joga primeiro
+% computerB. - IA joga em segundo
+% playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2). - Movimento do Jogador (P1=(X1,Y1) e P2=(X2,Y2), P1 superior/esquerda de P2)
 % playComputer(NewBoard, Sign, Board, Level, Victory, Defeat). - Movimento da IA
+% playComputer(NewBoard, BoardSize, Sign, Board, Level, Victory, Defeat). - Movimento da IA passando tamanho do tabuleiro
 %
-% Tabuleiro inicial
+% Tabuleiro inicial (exemplo)
 %
-%   1 2 3 4 5 6 7 8
-% 1| | | | | | | | |
-% 2| | | | | | | | |
-% 3| | | | | | | | |
-% 4| | | |W|B| | | |
-% 5| | | |B|W| | | |
-% 6| | | | | | | | |
-% 7| | | | | | | | |
-% 8| | | | | | | | |
+%   1 2 3 4 5 6 
+% 1|P|-|-|-|-|-|
+% 2|P|P|-|-|-|-|
+% 3|P|P|P|-|-|-|
+% 4|P|P|P|P|-|-|
+% 5|P|P|P|P|P|-|
+% 6|P|P|P|P|P|P|
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -32,12 +31,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Convenções
-turnToSign(w, w).
+turnToSign(a, a).
 turnToSign(b, b).
-enemy(w, b).
-enemy(b, w).
-nextPlayer(w, b).
-nextPlayer(b, w).
+enemy(a, b).
+enemy(b, a).
+nextPlayer(a, b).
+nextPlayer(b, a).
 
 % Guarda peças no tabuleiro
 putSign(Board, BoardSize, Line, Col, Sign, NewBoard) :-
@@ -67,7 +66,7 @@ findPiece(Board, BoardSize, S, Line, Col) :-
 % Recebe a peça correta
 getPiece(Board, BoardSize, Line, Col, P) :-
  getPos(Board, BoardSize, Line, Col, P),
- (P = w ; P = b).
+ P = p.
 
 % Recebe a posição
 getPos(Board, BoardSize, Line, Col, Sign) :-
@@ -81,74 +80,40 @@ getPos(Board, BoardSize, Line, Col, Sign) :-
 % Realiza o movimento das peças
 move(Board, BoardSize, Sign, NewBoard) :-
  validMove(Board, BoardSize, Sign, NewBoard).%Valida o movimento.
-move(Board, BoardSize, Sign, ToL, ToC, NewBoard) :-
- validMove(Board, BoardSize, Sign, ToL, ToC, NewBoard).%Valida o movimento.
+move(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
+ validMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).%Valida o movimento.
 
 % Um movimento é valido se:
 validMove(Board, BoardSize, Sign, NewBoard) :-
- validLoopMove(Board, BoardSize, Sign, _, _, NewBoard).%Loop de movimentos.
-validMove(Board, BoardSize, Sign, ToL, ToC, NewBoard) :-
- validLoopMove(Board, BoardSize, Sign, ToL, ToC, NewBoard).%Loop de movimentos.
+ validStdMove(Board, BoardSize, Sign, _, _, _, _, NewBoard).%Movimento normal.
+validMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
+ validStdMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).%Movimento normal.
 
 % Valida um movimento normal
-validLoopMove(Board, BoardSize, Sign, ToL, ToC, NewBoard) :-
- findPiece(Board, BoardSize, e, ToL, ToC),
- enterLoopMove(Board, BoardSize, Sign, ToL, ToC, 8, NewBoard, 0).
-
-enterLoopMove(Board, BoardSize, Sign, ToL, ToC, 0, NewBoard, 1) :-
- movePiece(Board, BoardSize, Sign, ToL, ToC, NewBoard), !. %RED!!!
-
-enterLoopMove(Board, BoardSize, Sign, ToL, ToC, OffsetNum, NewBoard, Validation) :-
- directionOffset(OffsetNum, IndexL, IndexC),
- NewOffsetNum is OffsetNum -1,
- (
-  validateMoveOffset(Board, BoardSize, Sign, ToL, ToC, IndexL, IndexC, TempBoard)
-  ->
-  NewValidation is 1,
-  enterLoopMove(TempBoard, BoardSize, Sign, ToL, ToC, NewOffsetNum, NewBoard, NewValidation)
-  ;
-  enterLoopMove(Board, BoardSize, Sign, ToL, ToC, NewOffsetNum, NewBoard, Validation)
- ).
-
-% Direções válidas
- directionOffset(8,  0,  1). % E
- directionOffset(7, -1,  1). % NE
- directionOffset(6, -1,  0). % N
- directionOffset(5, -1, -1). % NW
- directionOffset(4,  0, -1). % W
- directionOffset(3,  1, -1). % SW
- directionOffset(2,  1,  0). % S
- directionOffset(1,  1,  1). % SE
+validStdMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
+ validateMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2),
+ movePiece(Board, BoardSize, e, ToL1, ToC1, ToL2, ToC2, NewBoard).
+ %write(L),write('/'),write(C),write('-'),write(Tl),write('/'),write(Tc),nl.
 
 % Valida um único movimento normal
-validateMoveOffset(Board, BoardSize, Sign, ToL, ToC, IndexL, IndexC, NewBoard) :-
- enemy(Sign, EnemySign),
- NeighborL is ToL + IndexL,
- NeighborC is ToC + IndexC,
- NeighborL >= 0, NeighborL =< BoardSize,
- NeighborC >= 0, NeighborC =< BoardSize,
- findPiece(Board, BoardSize, EnemySign, NeighborL, NeighborC),
- followOffset(Board, BoardSize, Sign, EnemySign, NeighborL, NeighborC, IndexL, IndexC, TempBoard),
- movePiece(TempBoard, BoardSize, Sign, NeighborL, NeighborC, NewBoard), !. %RED!!!
-
-followOffset(Board, BoardSize, Sign, _, ReadL, ReadC, IndexL, IndexC, Board) :-
- EndL is ReadL + IndexL,
- EndC is ReadC + IndexC,
- EndL >= 0, EndL =< BoardSize,
- EndC >= 0, EndC =< BoardSize,
- findPiece(Board, BoardSize, Sign, EndL, EndC), !.
-followOffset(Board, BoardSize, Sign, EnemySign, ReadL, ReadC, IndexL, IndexC, NewBoard) :-
- NeighborL is ReadL + IndexL,
- NeighborC is ReadC + IndexC,
- NeighborL >= 0, NeighborL =< BoardSize,
- NeighborC >= 0, NeighborC =< BoardSize,
- findPiece(Board, BoardSize, EnemySign, NeighborL, NeighborC),
- followOffset(Board, BoardSize, Sign, EnemySign, NeighborL, NeighborC, IndexL, IndexC, TempBoard),
- movePiece(TempBoard, BoardSize, Sign, NeighborL, NeighborC, NewBoard), !.
+validateMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2) :-
+ (Sign = a ; Sign = b),
+ between(1, BoardSize, ToL1),
+ between(1, ToL1, ToC1),
+ findPiece(Board, BoardSize, p, ToL1, ToC1),
+ (
+  between(1, ToL1, ToL2),
+  ToC2 is ToC1
+  ;
+  ToL2 is ToL1,
+  between(1, ToC1, ToC2)
+ ),
+ findPiece(Board, BoardSize, p, ToL2, ToC2). %cut here somehow...
 
 % Realiza um movimento normal
-movePiece(Board, BoardSize, Sign, ToL, ToC, NewBoard) :-
- putSign(Board, BoardSize, ToL, ToC, Sign, NewBoard).
+movePiece(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
+ putSign(Board, BoardSize, ToL1, ToC1, Sign, TempBoard),
+ putSign(TempBoard, BoardSize, ToL2, ToC2, Sign, NewBoard).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%  JOGADAS PSEUDO-ALEATÓRIAS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -156,13 +121,25 @@ movePiece(Board, BoardSize, Sign, ToL, ToC, NewBoard) :-
 
 % Realiza o movimento das peças
 moveRandom(Board, BoardSize, Sign, NewBoard) :-
- moves(Sign/Board, BoardSize, PosList), !,
- random_member(_/NewBoard, PosList), !.
+ validMoveRandom(Board, BoardSize, Sign, NewBoard).%Valida o movimento.
+moveRandom(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
+ validMoveRandom(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).%Valida o movimento.
+
+% Um movimento é valido se:
+validMoveRandom(Board, BoardSize, Sign, NewBoard) :-
+ validStdMoveRandom(Board, BoardSize, Sign, _, _, _, _, NewBoard).%Movimento normal.
+validMoveRandom(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
+ validStdMoveRandom(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).%Movimento normal.
+
+% Valida um movimento normal, quer-se realizar somente uma jogada.
+validStdMoveRandom(Board, BoardSize, Sign, _, _, _, _, NewBoard) :-
+ moves(Sign/Board, BoardSize, PosList),!,
+ random_member(_/NewBoard, PosList),!.
 
 % Próximos movimentos
 moves(Turn/Board, BoardSize, [B|Bs]) :-
  nextPlayer(Turn, NextTurn),
- findall(NextTurn/NewBoard, validMove(Board, BoardSize, Turn, NewBoard), [B|Bs]), !.
+ findall(NextTurn/NewBoard, validMove(Board, BoardSize, Turn, NewBoard), [B|Bs]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%  PREDICADOS CENTRAIS DO JOGO  %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -170,25 +147,22 @@ moves(Turn/Board, BoardSize, [B|Bs]) :-
 
 % Define tamanho do tabuleiro
 setBoardSize(BoardSize) :-
- retractall(boardSize(_)),
  assert(boardSize(BoardSize)).
 
-% IA joga com as brancas
-computerW :-
- retractall(min2Move(_)),retractall(max2Move(_)),
- assert(min2Move(b/_)),assert(max2Move(w/_)).
+% Jogador começa
+computerA :-
+ assert(min2Move(b/_)),assert(max2Move(a/_)).
 
-% IA joga com as pretas
+% Computador começa
 computerB :-
- retractall(min2Move(_)),retractall(max2Move(_)),
- assert(min2Move(w/_)),assert(max2Move(b/_)).
+ assert(min2Move(a/_)),assert(max2Move(b/_)).
 
-% Movimento do Jogador (P=(X,Y))
-playHuman(NewBoard, Sign, Board, X, Y) :-
+% Captura o próximo movimento
+playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2) :-
  boardSize(BoardSize),
- move(Board, BoardSize, Sign, X, Y, NewBoard),!.% Jogada
+ move(Board, BoardSize, Sign, X1, Y1, X2, Y2, NewBoard),!.% Jogada
 
-% Movimento da IA
+% Movimento do Computador
 playComputer(NewBoard, Sign, Board, Level, Victory, Defeat) :-
  boardSize(BoardSize),
  (
@@ -202,11 +176,11 @@ playComputer(NewBoard, Sign, Board, Level, Victory, Defeat) :-
   NewBoard = Board,
   Victory = false
  ),!.
- 
+
 moveComputer(NewBoard, Sign, Board, Level) :-
+% write(Board),nl,
  boardSize(BoardSize),
  (
-  gameRunDown(BoardSize, Board, _),
   callMinMax(Sign/Board, BoardSize, -1000000, 1000000, _/NewBoard, _, Level, 5),!
   ->
   !
@@ -214,53 +188,34 @@ moveComputer(NewBoard, Sign, Board, Level) :-
   moveRandom(Board, BoardSize, Sign, NewestBoard),
   NewBoard = NewestBoard
  ).
-
-% Guardando turno
-gameRunDown(BoardSize, Board, TurnNumber) :-
- countElements(Board, e, Empty),
- TurnNumber is ((BoardSize * BoardSize) - Empty) / BoardSize,
- retractall(turnNumber(_)),
- assert(turnNumber(TurnNumber)).
-
-% Contador de peças
-countElements(Board, Sign, Res) :-
- Board =.. [b|List],
- countLoop(List, Sign, Res, 0).
-
-countLoop([], _, Res, Res) :- !.
-countLoop([Sign|Vals], Sign, Res, Counter) :-
- !, Counter1 is Counter + 1,
- countLoop(Vals, Sign, Res, Counter1).
-countLoop([_|Vals], Sign, Res, Counter) :-
- countLoop(Vals, Sign, Res, Counter).
  
 victoryBoard(Board, Sign, Victory) :-
  boardSize(BoardSize),
  enemy(Sign, EnemySign),
  (validMove(Board, BoardSize, EnemySign, _),! -> Victory = false ; Victory = true).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%  CALCULO DA JOGADA DO COMPUTADOR  %%%%%%%%%%%%%%%%%%%%%%%%
-% MiniMax + Podagem Alpha-Beta							%
-% Adaptado de A. Visser, Game Playing, University of Amsterdam, 2007		%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%  CALCULO DA JOGADA DO COMPUTADOR  %%%%%%%%%%%%%%%%%%%%%%
+% MiniMax + Podagem Alpha-Beta
+% Adaptado de A. Visser, Game Playing, University of Amsterdam, 2007
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 callMinMax(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth) :-
- loopAlphaBeta(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth), !.
+ loopAlphaBeta(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth),
+% write(Val),write(GoodPos),nl,
+ !.
 
 loopAlphaBeta(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth) :-
  (
   Depth > 0,
   moves(Pos, BoardSize, PosList),!,
   bestBound(PosList, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth)
-  ;
-  turnNumber(TurnNumber),
-  TurnNumber < 0.75 * BoardSize,
-  staticValuation(Pos, BoardSize, Val),!			% MinMax
+%  ,write(Val),write(GoodPos),nl
   ;
   staticValuation(Pos, BoardSize, SVal),			% MinMax
-  dinamicValuation(Pos, BoardSize, DVal, BDepth),		% Monte Carlo
-  Val is SVal * ((DVal * DVal) / BDepth)
+%  dinamicValuation(Pos, BoardSize, DVal, BDepth),		% Monte Carlo
+  DVal is 5,
+  Val is SVal * (DVal/BDepth),!
  ).								% Retorno da Posição
 
 bestBound([Pos|PosList], BoardSize, Alpha, Beta, GoodPos, GoodVal, Depth, BDepth) :-
@@ -297,9 +252,10 @@ betterBound(Pos, Val, _, Val1, Pos, Val) :-			% Pos > Pos1
 betterBound(_, _, Pos1, Val1, Pos1, Val1).
 
 
+
 % Heurística
 staticValuation(Turn/Board, BoardSize, Res) :-
- boardBonus(Board, BoardSize, Turn, ResBonus),
+ boardBonus(Turn, Board, BoardSize, ResBonus),
  (
   min2Move(Turn/_),
   Res is - ResBonus
@@ -309,23 +265,10 @@ staticValuation(Turn/Board, BoardSize, Res) :-
  ),!.
 
 % Bonus
-boardBonus(Board, BoardSize, Sign, Bonus) :-
- countElements(Board, Sign, Count),
- positionBonus(Board, BoardSize, Sign, Position),
- Bonus is Count + Position.
-
-% Posições no canto do tabuleiro têm maior valor
-positionBonus(Board, BoardSize, Sign, Bonus) :-
- findall(Line/Col, findPiece(Board, BoardSize, Sign, Line, Col), List),!,
- positionBonusLoop(List, BoardSize, Bonus, 0).
-
-positionBonusLoop([], _, Bonus, Bonus).
-positionBonusLoop([Line/Col|Vals], BoardSize, Bonus, Res) :-
- ((Line = 1, ResL is 1, !) ; (Line = BoardSize, ResL is 1, !) ; ResL is 0),
- ((Col = 1, ResC is 1, !) ; (Col = BoardSize, ResC is 1, !) ; ResC is 0),
- NewRes is Res + ResL + ResC,
- positionBonusLoop(Vals, BoardSize, Bonus, NewRes).
-
+boardBonus(Sign, Board, BoardSize, Bonus) :-
+ moves(Sign/Board, BoardSize, PosList),!,
+ length(PosList, Res),
+ Bonus is Res.
 
 % Heurística
 dinamicValuation(Turn/Board, BoardSize, Res, BDepth) :-

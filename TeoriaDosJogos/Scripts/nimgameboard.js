@@ -22,7 +22,7 @@ function startMenuNim() {
 
 function renderNimStartMenu() {
     var menuX = 200;
-    var menuY = 250;
+    var menuY = 300;
 
     Crafty.e("2D, Canvas, Color")
     .attr({ x: startX, y: startY, w: board[0] * w, h: board.length * h })

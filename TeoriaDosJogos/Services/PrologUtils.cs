@@ -19,7 +19,7 @@ namespace TeoriaDosJogos.Services
 
         public static char[][] StringToGameboard(string gameboard, int[] gameboardLines)
         {
-            string[] charsToTrim = { "b", ",", "(", ")" };
+            string[] charsToTrim = { "b(", ",", ")" };
             var gameboardTrim = gameboard;
 
             foreach (var charToTrim in charsToTrim)

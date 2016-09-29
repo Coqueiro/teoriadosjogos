@@ -16,14 +16,18 @@ namespace TeoriaDosJogos.Services
         public static string GameFile(string game)
         {
             if (game == "Domineering") return "domineering";
+            else if (game == "Nim") return "nim";
             else if (game == "Nim2D") return "nim2d";
+            else if (game == "Othello") return "othello";
             else return "";
         }
 
         public static string ComputerName(string game)
         {
             if (game == "Domineering") return "computerH";
+            else if (game == "Nim") return "computerA";
             else if (game == "Nim2D") return "computerA";
+            else if (game == "Othello") return "computerW";
             else return "";
         }
 
