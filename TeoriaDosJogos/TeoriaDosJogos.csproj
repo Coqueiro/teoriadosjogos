@@ -257,7 +257,7 @@
     <Content Include="Scripts\gameselector.js" />
     <Content Include="Scripts\parametersSelectorEAD.js" />
     <Content Include="Scripts\parametersSelector.js" />
-    <Content Include="Scripts\utilEAD1.js" />
+    <Content Include="Scripts\utilEAD.js" />
     <Content Include="Scripts\util.js" />
     <Content Include="Scripts\othellogameboard.js" />
     <Content Include="Scripts\nimgameboard.js" />
