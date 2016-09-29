@@ -91,7 +91,7 @@ function renderOthelloSelectors() {
     selectorY = selectorY + height;
     createArraySelector("Linhas", "lines", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
     selectorY = selectorY + height;
-    createArraySelector("Primeiro player", "firstPlayer", spacing, ["Black", "White"], 0, selectorX, selectorY);
+    createArraySelector("Primeiro player", "firstPlayer", spacing, ["Azul", "Amarelo"], 0, selectorX, selectorY);
 }
 
 function initGameOthello() {
