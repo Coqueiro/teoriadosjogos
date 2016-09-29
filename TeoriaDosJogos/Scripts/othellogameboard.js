@@ -12,6 +12,7 @@
     window.level = parseInt(getParameterByName("level")) || 1;
     window.lines = parseInt(getParameterByName("lines")) || 8;
     window.rows = parseInt(getParameterByName("rows")) || 8;
+    window.firstPlayer = getParameterByName("firstPlayer") || "Black";
     startMenuOthello();
 }
 
@@ -92,6 +93,8 @@ function renderOthelloSelectors() {
     createArraySelector("Linhas", "lines", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
     selectorY = selectorY + height;
     createArraySelector("Colunas", "rows", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
+    selectorY = selectorY + height;
+    createArraySelector("Primeiro player", "firstPlayer", spacing, ["Black", "White"], 0, selectorX, selectorY);
 }
 
 function initGameOthello() {
@@ -99,6 +102,14 @@ function initGameOthello() {
     Crafty.trigger("DestroySelector");
     othelloBoardGenerator(lines, rows);
     othelloBoardRender();
+    if (firstPlayer == "White") {
+        freeze = true;
+        var options = {};
+        options["level"] = level;
+        if (playerBlack) options["orientation"] = "w";
+        else if (!playerBlack) options["orientation"] = "b";
+        queryGameboard(getOthelloBoard(), "Othello", options, setOthelloBoard);
+    };
 }
 
 function othelloBoardGenerator(lines, rows) {
