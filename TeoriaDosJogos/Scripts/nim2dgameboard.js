@@ -355,8 +355,8 @@ function setNim2DBoard(prologNim2DBoard) {
                 else if (simpleNim2DBoard[i][j] == true) checkerBoard[i][j].trigger("Delete");
             }
         }
-    }
 
-    freeze = false;
+        freeze = false;
+    }
 }
     

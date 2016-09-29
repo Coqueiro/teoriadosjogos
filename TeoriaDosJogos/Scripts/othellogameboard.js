@@ -379,9 +379,9 @@ function setOthelloBoard(simpleOthelloBoard, playerTurn) {
                 othelloBoard[i][j].trigger("PopulateByColor", new Array(simpleOthelloBoard[i][j]));
             }
         }
-    }
 
-    freeze = false;
+        freeze = false;
+    }
 }
 
 

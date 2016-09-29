@@ -189,25 +189,24 @@ playHuman(NewBoard, Sign, Board, X, Y) :-
  move(Board, BoardSize, Sign, X, Y, NewBoard),!.% Jogada
 
 % Movimento da IA
-playComputer(NewBoard, Sign, Board, Level, Victory, Defeat) :-
+playComputer(NewBoard, Sign, Board, Level, EndGame, Victory) :-
  boardSize(BoardSize),
  (
-  validMove(Board, BoardSize, Sign, _),! 
-  -> 
-  Defeat = false,
-  moveComputer(NewBoard, Sign, Board, Level),!,
-  victoryBoard(NewBoard, Sign, Victory),!
-  ; 
-  Defeat = true,
+  validMove(Board, BoardSize, Sign, _), !
+  ->
+  moveComputer(NewBoard, Sign, Board, Level), !,
+  victoryBoard(NewBoard, Sign, EndGame, Victory), !
+  ;
   NewBoard = Board,
-  Victory = false
- ),!.
+  EndGame = true,
+  victoryBoard(Board, Sign, Victory)
+ ), !.
  
 moveComputer(NewBoard, Sign, Board, Level) :-
  boardSize(BoardSize),
  (
   gameRunDown(BoardSize, Board, _),
-  callMinMax(Sign/Board, BoardSize, -1000000, 1000000, _/NewBoard, _, Level, 5),!
+  callMinMax(Sign/Board, BoardSize, -1000000, 1000000, _/NewBoard, _, Level, 5), !
   ->
   !
   ;
@@ -234,10 +233,27 @@ countLoop([Sign|Vals], Sign, Res, Counter) :-
 countLoop([_|Vals], Sign, Res, Counter) :-
  countLoop(Vals, Sign, Res, Counter).
  
-victoryBoard(Board, Sign, Victory) :-
+victoryBoard(Board, Sign, EndGame, Victory) :-
  boardSize(BoardSize),
  enemy(Sign, EnemySign),
- (validMove(Board, BoardSize, EnemySign, _),! -> Victory = false ; Victory = true).
+ (
+  validMove(Board, BoardSize, EnemySign, _), !
+  ->
+  EndGame = false, Victory = false
+  ;
+  EndGame = true, victoryBoard(Board, Sign, Victory)
+ ).
+ 
+victoryBoard(Board, Sign, Victory) :-
+ enemy(Sign, EnemySign),
+ (
+  countElements(Board, Sign, CountS), countElements(Board, EnemySign, CountE),
+  CountS >= CountE, !
+  ->
+  Victory = true
+  ;
+  Victory = false
+ ).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%  CALCULO DA JOGADA DO COMPUTADOR  %%%%%%%%%%%%%%%%%%%%%%%%

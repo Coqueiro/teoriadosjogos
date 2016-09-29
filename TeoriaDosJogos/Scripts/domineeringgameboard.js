@@ -246,8 +246,8 @@ function setDomineeringBoard(simpleDomineeringBoard, playerTurn) {
                 else if (simpleDomineeringBoard[i][j] == "e") domineeringBoard[i][j].trigger("Unpopulate");
             }
         }
-    }
 
-    freeze = false;
+        freeze = false;
+    }
 }
     

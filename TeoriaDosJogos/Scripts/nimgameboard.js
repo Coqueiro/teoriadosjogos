@@ -234,7 +234,7 @@ function setNimBoard(prologNimBoard) {
                 else if (simpleNimBoard[i][j] == true) stickBoard[i][j].trigger("Delete");
             }
         }
-    }
 
-    freeze = false;
+        freeze = false;
+    }
 }

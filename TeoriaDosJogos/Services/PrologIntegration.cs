@@ -31,6 +31,15 @@ namespace TeoriaDosJogos.Services
             else return "";
         }
 
+        public static string VictoryPattern(string game)
+        {
+            if (game == "Domineering") return ", Victory, Defeat)";
+            else if (game == "Nim") return ", Victory, Defeat)";
+            else if (game == "Nim2D") return ", Victory, Defeat)";
+            else if (game == "Othello") return ", EndGame, Victory)";
+            else return "";
+        }
+
         public static string IAPlay(string gameboard, GameboardModel gameboardModel)
         {
             var projectPath = System.AppDomain.CurrentDomain.BaseDirectory;
@@ -43,14 +52,26 @@ namespace TeoriaDosJogos.Services
             }
 
             var answer = "";
-            var query = ComputerName(gameboardModel.Game) + ", setBoardSize(" + gameboardModel.Gameboard.Length + "), playComputer(NewBoard, " + gameboardModel.Orientation + ", b(" + gameboard + "), " + gameboardModel.Level + ", Victory, Defeat)";
+            var query = ComputerName(gameboardModel.Game) + ", setBoardSize(" + gameboardModel.Gameboard.Length + "), playComputer(NewBoard, " + gameboardModel.Orientation + ", b(" + gameboard + "), " + gameboardModel.Level + VictoryPattern(gameboardModel.Game);
             using (PlQuery q = new PlQuery(query))
             {
                 foreach (PlQueryVariables v in q.SolutionVariables)
                 {
-                    if (v["Defeat"].ToString() == "true") answer = "defeat";
-                    else if (v["Victory"].ToString() == "true") answer = "victory";
-                    else answer = v["NewBoard"].ToString();
+                    if (gameboardModel.Game == "Othello")
+                    {
+                        if (v["EndGame"].ToString() == "true")
+                        {
+                            if (v["Victory"].ToString() == "true") answer = "victory";
+                            else if (v["Victory"].ToString() == "false") answer = "defeat";
+                        }
+                        else answer = v["NewBoard"].ToString();
+                    }
+                    else
+                    {
+                        if (v["Defeat"].ToString() == "true") answer = "defeat";
+                        else if (v["Victory"].ToString() == "true") answer = "victory";
+                        else answer = v["NewBoard"].ToString();
+                    }
                 }
             }
 
