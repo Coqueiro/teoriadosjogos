@@ -13,8 +13,8 @@ namespace TeoriaDosJogos.Models
         [JsonProperty("level")]
         public int Level { get; set; }
 
-        [JsonProperty("miserie")]
-        public string Miserie { get; set; }
+        [JsonProperty("misere")]
+        public string Misere { get; set; }
 
         [JsonProperty("orientation")]
         public string Orientation { get; set; }

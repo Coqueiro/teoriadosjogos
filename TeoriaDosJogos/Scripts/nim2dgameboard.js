@@ -4,7 +4,7 @@
     window.freeze = false;
     window.varianceX = 60, varianceY = 60, startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
     window.level = parseInt(getParameterByName("level")) || 1;
-    window.miserie = (getParameterByName("miserie") === "true") || "Normal";
+    window.misere = (getParameterByName("misere") === "normal") || "normal";
     window.lines = parseInt(getParameterByName("lines")) || 3;
     window.firstLine = parseInt(getParameterByName("firstLine")) || 3;
     window.increaseByLine = parseInt(getParameterByName("increaseByLine")) || 2;
@@ -89,7 +89,7 @@ function renderNim2DSelectors() {
 
     createArraySelector("Dificuldade", "level", spacing, [0, 1, 2], 1, selectorX, selectorY);
     selectorY = selectorY + height;
-    createArraySelector("Modo de Jogo", "miserie", spacing, ["Normal", "Miséria"], 0, selectorX, selectorY);
+    createArraySelector("Modo de Jogo", "misere", spacing, ["normal", "misere"], 0, selectorX, selectorY);
     selectorY = selectorY + height;
     createArraySelector("Linhas", "lines", spacing, [3, 4, 5, 6], 0, selectorX, selectorY);
     selectorY = selectorY + height;
@@ -109,7 +109,7 @@ function initNim2DGame() {
         freeze = true;
         var options = {};
         options["level"] = level;
-        options["miserie"] = miserie;
+        options["misere"] = misere;
         options["orientation"] = "a";
         queryGameboard(getPrologNim2DBoard(), "Nim2D", options, setNim2DBoard);
     };
@@ -277,7 +277,7 @@ function deleteCheckers(line, row, line2, row2) {
         freeze = true;
         var options = {};
         options["level"] = level;
-        options["miserie"] = miserie;
+        options["misere"] = misere;
         if (firstPlayer == "Primeiro") options["orientation"] = "b";
         else if (firstPlayer == "Segundo") options["orientation"] = "a";
         queryGameboard(getPrologNim2DBoard(), "Nim2D", options, setNim2DBoard);

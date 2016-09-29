@@ -4,6 +4,7 @@
     window.startX = 10, startY = 10, contourLength = 3, w = 40, h = 40;
     window.freeze = false;
     window.level = parseInt(getParameterByName("level")) || 1;
+    window.misere = (getParameterByName("misere") === "normal") || "normal";
     window.lines = parseInt(getParameterByName("lines")) || 8;
     window.firstPlayer = getParameterByName("firstPlayer") || "Vertical";
     startMenuDomineering();
@@ -88,6 +89,8 @@ function renderDomineeringSelectors() {
 
     createArraySelector("Dificuldade", "level", spacing, [1, 2], 0, selectorX, selectorY);
     selectorY = selectorY + height;
+    createArraySelector("Modo de Jogo", "misere", spacing, ["normal", "misere"], 0, selectorX, selectorY);
+    selectorY = selectorY + height;
     createArraySelector("Tamanho", "lines", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
     selectorY = selectorY + height;
     createArraySelector("Primeiro player", "firstPlayer", spacing, ["Vertical", "Horizontal"], 0, selectorX, selectorY);
@@ -103,6 +106,7 @@ function initDomineeringGame() {
         freeze = true;
         var options = {};
         options["level"] = level;
+        options["misere"] = misere;
         if (firstPlayer == "Vertical") options["orientation"] = "h";
         else if (firstPlayer == "Horizontal") options["orientation"] = "v";
         queryGameboard(getDomineeringBoard(), "Domineering", options, setDomineeringBoard);
@@ -215,6 +219,7 @@ function dominoPlacer(line, row) {
                 freeze = true;
                 var options = {};
                 options["level"] = level;
+                options["misere"] = misere;
                 if (firstPlayer == "Vertical") options["orientation"] = "h";
                 else if (firstPlayer == "Horizontal") options["orientation"] = "v";
                 queryGameboard(getDomineeringBoard(), "Domineering", options, setDomineeringBoard);

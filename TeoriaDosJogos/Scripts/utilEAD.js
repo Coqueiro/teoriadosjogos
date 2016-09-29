@@ -16,7 +16,7 @@ function queryGameboard(gameboard, game, options, callback) {
     }
 
     if (options.level != undefined) setData["level"] = options.level;
-    if (options.miserie != undefined) setData["miserie"] = options.miserie;
+    if (options.misere != undefined) setData["misere"] = options.misere;
     if (options.orientation != undefined) setData["orientation"] = options.orientation;
 
     $.ajax({

@@ -7,6 +7,7 @@
 % Indicação: 2-Principiante, 3-Amador, 4-intermediario, 5-Avançado, 6-Mestre
 %
 % setBoardSize(BoardSize). - Define tamanho do tabuleiro
+% setPlayRule(PlayRule). - Define a regra de jogo (normal/misere)
 % computerW. - IA joga com as brancas
 % computerB. - IA joga com as pretas
 % playHuman(NewBoard, Sign, Board, X, Y). - Movimento do Jogador (P=(X,Y))
@@ -173,6 +174,11 @@ setBoardSize(BoardSize) :-
  retractall(boardSize(_)),
  assert(boardSize(BoardSize)).
 
+% Define a regra de jogo
+setPlayRule(PlayRule) :-
+ retractall(playRule(_)),
+ assert(playRule(PlayRule)).
+
 % IA joga com as brancas
 computerW :-
  retractall(min2Move(_)),retractall(max2Move(_)),
@@ -248,7 +254,7 @@ victoryBoard(Board, Sign, Victory) :-
  enemy(Sign, EnemySign),
  (
   countElements(Board, Sign, CountS), countElements(Board, EnemySign, CountE),
-  CountS >= CountE, !
+  (playRule(misere), CountS =< CountE ; playRule(normal), CountS >= CountE), !
   ->
   Victory = true
   ;
@@ -272,11 +278,13 @@ loopAlphaBeta(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth) :-
   ;
   turnNumber(TurnNumber),
   TurnNumber < 0.75 * BoardSize,
-  staticValuation(Pos, BoardSize, Val),!			% MinMax
+  staticValuation(Pos, BoardSize, ResVal), !,			% MinMax
+  (playRule(misere), Val is -ResVal ; playRule(normal), Val is ResVal)
   ;
   staticValuation(Pos, BoardSize, SVal),			% MinMax
   dinamicValuation(Pos, BoardSize, DVal, BDepth),		% Monte Carlo
-  Val is SVal * ((DVal * DVal) / BDepth)
+  ResVal is SVal * ((DVal * DVal) / BDepth),
+  (playRule(misere), Val is -ResVal ; playRule(normal), Val is ResVal)
  ).								% Retorno da Posição
 
 bestBound([Pos|PosList], BoardSize, Alpha, Beta, GoodPos, GoodVal, Depth, BDepth) :-

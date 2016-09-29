@@ -10,6 +10,7 @@
     window.blackColor = "blue";
     window.whiteColor = "yellow";
     window.level = parseInt(getParameterByName("level")) || 1;
+    window.misere = (getParameterByName("misere") === "normal") || "normal";
     window.lines = parseInt(getParameterByName("lines")) || 8;
     window.firstPlayer = getParameterByName("firstPlayer") || "Azul";
     startMenuOthello();
@@ -89,6 +90,8 @@ function renderOthelloSelectors() {
 
     createArraySelector("Dificuldade", "level", spacing, [1, 2, 3], 0, selectorX, selectorY);
     selectorY = selectorY + height;
+    createArraySelector("Modo de Jogo", "misere", spacing, ["normal", "misere"], 0, selectorX, selectorY);
+    selectorY = selectorY + height;
     createArraySelector("Tamanho", "lines", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
     selectorY = selectorY + height;
     createArraySelector("Primeiro player", "firstPlayer", spacing, ["Azul", "Amarelo"], 0, selectorX, selectorY);
@@ -103,6 +106,7 @@ function initGameOthello() {
         freeze = true;
         var options = {};
         options["level"] = level;
+        options["misere"] = misere;
         if (playerBlack) options["orientation"] = "w";
         else if (!playerBlack) options["orientation"] = "b";
         queryGameboard(getOthelloBoard(), "Othello", options, setOthelloBoard);
@@ -327,6 +331,7 @@ function spacePlacer(line, row, color) {
             freeze = true;
             var options = {};
             options["level"] = level;
+            options["misere"] = misere;
             if (playerBlack) options["orientation"] = "w";
             else if (!playerBlack) options["orientation"] = "b";
             queryGameboard(getOthelloBoard(), "Othello", options, setOthelloBoard);
