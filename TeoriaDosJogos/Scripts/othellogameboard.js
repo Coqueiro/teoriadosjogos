@@ -87,7 +87,7 @@ function renderOthelloSelectors() {
     var height = 35;
     var spacing = 100;
 
-    createArraySelector("Dificuldade", "level", spacing, [0, 1, 2], 1, selectorX, selectorY);
+    createArraySelector("Dificuldade", "level", spacing, [1, 2, 3], 0, selectorX, selectorY);
     selectorY = selectorY + height;
     createArraySelector("Tamanho", "lines", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
     selectorY = selectorY + height;
