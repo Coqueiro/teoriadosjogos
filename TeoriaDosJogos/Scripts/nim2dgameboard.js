@@ -111,7 +111,7 @@ function initNim2DGame() {
         options["level"] = level;
         options["miserie"] = miserie;
         options["orientation"] = "a";
-        queryGameboard(getPrologNimBoard(), "Nim2D", options, setNim2DBoard);
+        queryGameboard(getPrologNim2DBoard(), "Nim2D", options, setNim2DBoard);
     };
 }
 
@@ -274,17 +274,17 @@ function deleteCheckers(line, row, line2, row2) {
     }
 
     if (markedCheckers.length > 0) {
+        freeze = true;
         var options = {};
         options["level"] = level;
         options["miserie"] = miserie;
         if (firstPlayer == "Primeiro") options["orientation"] = "b";
         else if (firstPlayer == "Segundo") options["orientation"] = "a";
-        freeze = true;
-        queryGameboard(getPrologNimBoard(), "Nim2D", options, setNim2DBoard);
+        queryGameboard(getPrologNim2DBoard(), "Nim2D", options, setNim2DBoard);
     }
 }
 
-function getPrologNimBoard() {
+function getPrologNim2DBoard() {
     var prologNim2DBoard = [];
     var boardSize = firstLine + increaseByLine * (lines - 1);
     var iterator = 0;

@@ -2,7 +2,7 @@
     window.stickBoard = [];
     window.board = [];
     window.freeze = false;
-    window.varianceX = 40, varianceY = 50, startX = 10, startY = 10, w = 20, h = 40;
+    window.varianceX = 40, varianceY = 50, startX = 10, startY = 10, contourLength = 3, w = 20, h = 40;
     window.level = parseInt(getParameterByName("level")) || 1;
     window.miserie = (getParameterByName("miserie") === "true") || "Normal";
     window.lines = parseInt(getParameterByName("lines")) || 3;
@@ -105,6 +105,15 @@ function initNimGame() {
     Crafty.trigger("DestroySelector");
     nimBoardGenerator(lines, firstLine, increaseByLine);
     sticksPositioner();
+    if (firstPlayer == "Segundo") {
+        freeze = true;
+        var options = {};
+        options["level"] = level;
+        options["miserie"] = miserie;
+        if (firstPlayer == "Primeiro") options["orientation"] = "b";
+        else if (firstPlayer == "Segundo") options["orientation"] = "a";
+        queryGameboard(getPrologNimBoard(), "Nim", options, setNimBoard);
+    };
 }
 
 function nimBoardGenerator(lines, firstLine, factorUp) {
@@ -129,6 +138,7 @@ function sticksPositioner() {
             stick = Crafty.e("2D, Canvas, Color, Mouse")
             .attr({ x: x, y: y, w: w, h: h })
             .color("black")
+            .bind("Terminate", function() {this.destroy() })
             .bind("Delete", function () {
                 this.color("white");
                 this.destroyed = true;
@@ -143,7 +153,7 @@ function sticksPositioner() {
             stick["line"] = lines;
             stick["row"] = rows;
             stick["destroyed"] = false;
-            checker["status"] = "p";
+            stick["status"] = "p";
 
             stickBoard[stickBoardIndex].push(stick);
             x = x + varianceX;
@@ -168,12 +178,12 @@ function deleteSticks(line, row) {
         }
     }
 
+    freeze = true;
     var options = {};
     options["level"] = level;
     options["miserie"] = miserie;
     if (firstPlayer == "Primeiro") options["orientation"] = "b";
     else if (firstPlayer == "Segundo") options["orientation"] = "a";
-    freeze = true;
     queryGameboard(getPrologNimBoard(), "Nim", options, setNimBoard);
 }
 
@@ -214,7 +224,7 @@ function getNimBoard() {
 }
 
 function setNimBoard(prologNimBoard) {
-    simpleNimBoard = NimPrologToBoard(prologNim2DBoard);
+    simpleNimBoard = NimPrologToBoard(prologNimBoard);
     if (simpleNimBoard == "false") renderNimGameOver("Computer won!");
     else if (simpleNimBoard == "true") renderNimGameOver("Player won!");
     else {
