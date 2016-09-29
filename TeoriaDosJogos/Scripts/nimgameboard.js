@@ -87,7 +87,7 @@ function renderNimSelectors() {
     var height = 35;
     var spacing = 100;
 
-    createArraySelector("Dificuldade", "level", spacing, [0, 1, 2], 1, selectorX, selectorY);
+    createArraySelector("Dificuldade", "level", spacing, [1, 2, 3], 1, selectorX, selectorY);
     selectorY = selectorY + height;
     createArraySelector("Modo de Jogo", "misere", spacing, ["normal", "misere"], 0, selectorX, selectorY);
     selectorY = selectorY + height;

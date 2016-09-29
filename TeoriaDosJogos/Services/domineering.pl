@@ -7,6 +7,7 @@
 % Indicação: 2-Principiante, 3-Amador, 4-intermediario, 5-Avançado, 6-Mestre
 %
 % setBoardSize(BoardSize). - Define tamanho do tabuleiro
+% setPlayRule(PlayRule). - Define a regra de jogo (normal/misere)
 % computerV. - IA joga na vertical
 % computerH. - IA joga na horizontal
 % playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2). - Movimento do Jogador (P1=(X1,Y1) e P2=(X2,Y2), P1 superior/esquerda de P2)
@@ -120,18 +121,6 @@ movePiece(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
 
 % Realiza o movimento das peças
 moveRandom(Board, BoardSize, Sign, NewBoard) :-
- validMoveRandom(Board, BoardSize, Sign, NewBoard).%Valida o movimento.
-moveRandom(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
- validMoveRandom(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).%Valida o movimento.
-
-% Um movimento é valido se:
-validMoveRandom(Board, BoardSize, Sign, NewBoard) :-
- validStdMoveRandom(Board, BoardSize, Sign, _, _, _, _, NewBoard).%Movimento normal.
-validMoveRandom(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
- validStdMoveRandom(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).%Movimento normal.
-
-% Valida um movimento normal, quer-se realizar somente uma jogada.
-validStdMoveRandom(Board, BoardSize, Sign, _, _, _, _, NewBoard) :-
  moves(Sign/Board, BoardSize, PosList),!,
  random_member(_/NewBoard, PosList),!.
 
@@ -149,6 +138,11 @@ setBoardSize(BoardSize) :-
  retractall(boardSize(_)),
  assert(boardSize(BoardSize)).
 
+% Define a regra de jogo
+setPlayRule(PlayRule) :-
+ retractall(playRule(_)),
+ assert(playRule(PlayRule)).
+
 % IA joga na vertical
 computerV :-
  retractall(min2Move(_)),retractall(max2Move(_)),
@@ -165,58 +159,70 @@ playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2) :-
  move(Board, BoardSize, Sign, X1, Y1, X2, Y2, NewBoard),!.% Jogada
 
 % Movimento da IA
-playComputer(NewBoard, Sign, Board, Level, Victory, Defeat) :-
+playComputer(NewBoard, Sign, Board, Level, EndGame, Victory) :-
  boardSize(BoardSize),
  (
-  validMove(Board, BoardSize, Sign, _),! 
-  -> 
-  Defeat = false,
-  moveComputer(NewBoard, Sign, Board, Level),!,
-  victoryBoard(NewBoard, Sign, Victory),!
-  ; 
-  Defeat = true,
+  validMove(Board, BoardSize, Sign, _), ! 
+  ->
+  moveComputer(NewBoard, Sign, Board, Level), !,
+  victoryBoard(NewBoard, Sign, EndGame, Victory), !
+  ;
   NewBoard = Board,
-  Victory = false
- ),!.
+  EndGame = true,
+  (playRule(misere), Victory = true ; playRule(normal), Victory = false)
+ ), !.
 
 moveComputer(NewBoard, Sign, Board, Level) :-
  boardSize(BoardSize),
- gameRunDown(BoardSize, Board, TurnNumber),
- retractall(turnNumber(_)),
- assert(turnNumber(TurnNumber)),
- callMinMax(Sign/Board, BoardSize, -1000000, 1000000, _/NewBoard, _, Level, 10),!.
+ (
+  gameRunDown(BoardSize, Board, _),
+  callMinMax(Sign/Board, BoardSize, -1000000, 1000000, _/NewBoard, _, Level, 5), !
+  ->
+  !
+  ;
+  moveRandom(Board, BoardSize, Sign, NewestBoard),
+  NewBoard = NewestBoard
+ ).
 
+% Guardando turno
 gameRunDown(BoardSize, Board, TurnNumber) :-
- Board =.. [b|ListBoard],
- countElements(ListBoard, e, Empty),
- TurnNumber is Empty / BoardSize.
+ countElements(Board, e, Empty),
+ TurnNumber is ((BoardSize * BoardSize) - Empty) / BoardSize,
+ retractall(turnNumber(_)),
+ assert(turnNumber(TurnNumber)).
 
-countElements([X|T], X, Y):-
- countElements(T, X, Z),
- Y is 1 + Z.
-countElements([X1|T], X, Z):-
- X1 \= X,
- countElements(T, X, Z).
-countElements([], _, 0).
+% Contador de peças
+countElements(Board, Sign, Res) :-
+ Board =.. [b|List],
+ countLoop(List, Sign, Res, 0).
+
+countLoop([], _, Res, Res) :- !.
+countLoop([Sign|Vals], Sign, Res, Counter) :-
+ !, Counter1 is Counter + 1,
+ countLoop(Vals, Sign, Res, Counter1).
+countLoop([_|Vals], Sign, Res, Counter) :-
+ countLoop(Vals, Sign, Res, Counter).
  
-victoryBoard(Board, Sign, Victory) :-
+victoryBoard(Board, Sign, EndGame, Victory) :-
  boardSize(BoardSize),
  enemy(Sign, EnemySign),
- (validMove(Board, BoardSize, EnemySign, _),! -> Victory = false ; Victory = true).
+ (
+  validMove(Board, BoardSize, EnemySign, _), !
+  ->
+  EndGame = false, Victory = false
+  ;
+  EndGame = true,
+  (playRule(misere), Victory = false ; playRule(normal), Victory = true)
+ ).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%  CALCULO DA JOGADA DO COMPUTADOR  %%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MiniMax + Podagem Alpha-Beta
 % Adaptado de A. Visser, Game Playing, University of Amsterdam, 2007
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 callMinMax(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth) :-
- loopAlphaBeta(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth),
-% write(Val),write(GoodPos),nl,
- !.
+ loopAlphaBeta(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth), !.
 
 loopAlphaBeta(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth) :-
  (
@@ -225,15 +231,18 @@ loopAlphaBeta(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth) :-
   bestBound(PosList, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth)
   ;
   turnNumber(TurnNumber),
-  TurnNumber >= BoardSize - 3,
-  staticValuation(Pos, BoardSize, Val,_),!			% MinMax
+  TurnNumber =< 0.3 * BoardSize,
+  staticValuationOpen(Pos, BoardSize, ResVal), !,		% MinMax
+  (playRule(misere), Val is -ResVal ; playRule(normal), Val is ResVal)
   ;
   turnNumber(TurnNumber),
-  TurnNumber < BoardSize - 3,
-  TurnNumber >= 2,
-  staticValuation(Pos, BoardSize, Val),!			% MinMax
+  TurnNumber > 0.3 * BoardSize,
+  TurnNumber =< 0.85 * BoardSize,
+  staticValuation(Pos, BoardSize, ResVal), !,			% MinMax
+  (playRule(misere), Val is -ResVal ; playRule(normal), Val is ResVal)
   ;
-  dinamicValuation(Pos, BoardSize, Val, BDepth),!		% Monte Carlo
+  dinamicValuation(Pos, BoardSize, ResVal, BDepth), !,		% Monte Carlo
+  (playRule(misere), Val is -ResVal ; playRule(normal), Val is ResVal)
  ).								% Retorno da Posição
 
 bestBound([Pos|PosList], BoardSize, Alpha, Beta, GoodPos, GoodVal, Depth, BDepth) :-
@@ -271,7 +280,62 @@ betterBound(_, _, Pos1, Val1, Pos1, Val1).
 
 
 
-% Heurística
+% Heurística da abertura
+staticValuationOpen(Turn/Board, BoardSize, Res) :-
+ boardBonusOpen(Turn, Board, BoardSize, ResBonus),
+ (
+  min2Move(Turn/_),
+  Res is - ResBonus
+  ;
+  max2Move(Turn/_),
+  Res is ResBonus
+ ),!.
+
+boardBonusOpen(Turn, Board, BoardSize, Bonus) :-
+ enemy(Turn, EnemyTurn),
+ countBonusOpen(Turn, EnemyTurn, Board, BoardSize, Bonus, BoardSize, 0).
+
+countBonusOpen(_, _, _, _, Bonus, 0, Bonus) :- !.
+countBonusOpen(Turn, EnemyTurn, Board, BoardSize, Bonus, Loop, CounterBonus) :-
+ incrementalBonusBorder(Turn, Loop, Board, BoardSize, BonusBT),
+ incrementalBonusBorder(EnemyTurn, Loop, Board, BoardSize, BonusBE),
+ NewCounterBonus is 
+  CounterBonus 
+  + 2 * BonusBT - BonusBE,
+ NewLoop is Loop - 1,
+ countBonusOpen(Turn, EnemyTurn, Board, BoardSize, Bonus, NewLoop, NewCounterBonus).
+
+incrementalBonusBorder(v, Line, Board, BoardSize, Bonus) :-
+ (
+  findPiece(Board, BoardSize, v, Line, 2), findPiece(Board, BoardSize, e, Line, 1) 
+  -> 
+  BonusA is 1 ; BonusA is 0
+ ),
+ Aux is BoardSize - 1,
+ (
+  findPiece(Board, BoardSize, v, Line, Aux), findPiece(Board, BoardSize, e, Line, BoardSize) 
+  -> 
+  BonusB is 1 ; BonusB is 0
+ ),
+ Bonus is BonusA + BonusB.
+
+incrementalBonusBorder(h, Col, Board, BoardSize, Bonus) :-
+ (
+  findPiece(Board, BoardSize, h, 2, Col), findPiece(Board, BoardSize, e, 1, Col) 
+  -> 
+  BonusA is 1 ; BonusA is 0
+ ),
+ Aux is BoardSize - 1,
+ (
+  findPiece(Board, BoardSize, h, Aux, Col), findPiece(Board, BoardSize, e, BoardSize, Col) 
+  -> 
+  BonusB is 1 ; BonusB is 0
+ ),
+ Bonus is BonusA + BonusB.
+
+
+
+% Heurística normal
 staticValuation(Turn/Board, BoardSize, Res) :-
  boardBonus(Turn, Board, BoardSize, ResBonus),
  (
@@ -282,17 +346,32 @@ staticValuation(Turn/Board, BoardSize, Res) :-
   Res is ResBonus
  ),!.
 
-staticValuation(Turn/Board, BoardSize, Res, _) :-
- boardBonus(Turn, Board, BoardSize, ResBonus, _),
- (
-  min2Move(Turn/_),
-  Res is - ResBonus
-  ;
-  max2Move(Turn/_),
-  Res is ResBonus
- ),!.
+% Bonus
+boardBonus(Turn, Board, BoardSize, Bonus) :-
+ enemy(Turn, EnemyTurn),
+ countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, BoardSize, 0).
 
-% Heurística
+countBonus(_, _, _, _, Bonus, 0, Bonus) :- !.
+countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, Loop, CounterBonus) :-
+ incrementalBonusBorder(Turn, Loop, Board, BoardSize, BonusBT),
+ incrementalBonusBorder(EnemyTurn, Loop, Board, BoardSize, BonusBE),
+ incrementalBonusField(Turn, Board, BoardSize, Loop, BonusFT, BoardSize, 0),
+ incrementalBonusField(EnemyTurn, Board, BoardSize, Loop, BonusFE, BoardSize, 0),
+ NewCounterBonus is 
+  CounterBonus 
+  + 2 * BonusBT - BonusBE 
+  + BonusFT - BonusFE,
+ NewLoop is Loop - 1,
+ countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, NewLoop, NewCounterBonus).
+
+incrementalBonusField(Sign, Board, BoardSize, _, Bonus, _, _) :-
+ moves(Sign/Board, BoardSize, PosList),!,
+ length(PosList, Res),
+ Bonus is Res.
+
+
+
+% Heurística do final
 dinamicValuation(Turn/Board, BoardSize, Res, BDepth) :-
  playRandomLoop(Board, BoardSize, Turn, Wins, Losses, BDepth),
  (
@@ -324,71 +403,6 @@ playRandom(Board, BoardSize, Sign, Win, Loss) :-
   ;
   Win is 0, Loss is 1, true
  ).
-
-% Bonus
-boardBonus(Turn, Board, BoardSize, Bonus) :-
- enemy(Turn, EnemyTurn),
- countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, BoardSize, 0).
-
-boardBonus(Turn, Board, BoardSize, Bonus, _) :-
- enemy(Turn, EnemyTurn),
- countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, BoardSize, 0, _).
-
-countBonus(_, _, _, _, Bonus, 0, Bonus) :- !.
-countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, Loop, CounterBonus) :-
- incrementalBonusBorder(Turn, Loop, Board, BoardSize, BonusBT),
- incrementalBonusBorder(EnemyTurn, Loop, Board, BoardSize, BonusBE),
- incrementalBonusField(Turn, Board, BoardSize, Loop, BonusFT, BoardSize, 0),
- incrementalBonusField(EnemyTurn, Board, BoardSize, Loop, BonusFE, BoardSize, 0),
- NewCounterBonus is 
-  CounterBonus 
-  + 2*BonusBT - BonusBE 
-  + BonusFT - BonusFE,
- NewLoop is Loop - 1,
- countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, NewLoop, NewCounterBonus).
-
-countBonus(_, _, _, _, Bonus, 0, Bonus, _) :- !.
-countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, Loop, CounterBonus, _) :-
- incrementalBonusBorder(Turn, Loop, Board, BoardSize, BonusBT),
- incrementalBonusBorder(EnemyTurn, Loop, Board, BoardSize, BonusBE),
- NewCounterBonus is 
-  CounterBonus 
-  + 2*BonusBT - BonusBE,
- NewLoop is Loop - 1,
- countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, NewLoop, NewCounterBonus).
-
-incrementalBonusBorder(v, Line, Board, BoardSize, Bonus) :-
- (
-  findPiece(Board, BoardSize, v, Line, 2), findPiece(Board, BoardSize, e, Line, 1) 
-  -> 
-  BonusA is 1 ; BonusA is 0
- ),
- Aux is BoardSize - 1,
- (
-  findPiece(Board, BoardSize, v, Line, Aux), findPiece(Board, BoardSize, e, Line, BoardSize) 
-  -> 
-  BonusB is 1 ; BonusB is 0
- ),
- Bonus is BonusA + BonusB.
-
-incrementalBonusBorder(h, Col, Board, BoardSize, Bonus) :-
- (
-  findPiece(Board, BoardSize, h, 2, Col), findPiece(Board, BoardSize, e, 1, Col) 
-  -> 
-  BonusA is 1 ; BonusA is 0
- ),
- Aux is BoardSize - 1,
- (
-  findPiece(Board, BoardSize, h, Aux, Col), findPiece(Board, BoardSize, e, BoardSize, Col) 
-  -> 
-  BonusB is 1 ; BonusB is 0
- ),
- Bonus is BonusA + BonusB.
-
-incrementalBonusField(Sign, Board, BoardSize, _, Bonus, _, _) :-
- moves(Sign/Board, BoardSize, PosList),!,
- length(PosList, Res),
- Bonus is Res.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  FIM DO PROGRAMA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

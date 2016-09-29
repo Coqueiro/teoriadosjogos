@@ -87,7 +87,7 @@ function renderDomineeringSelectors() {
     var height = 35;
     var spacing = 100;
 
-    createArraySelector("Dificuldade", "level", spacing, [1, 2], 0, selectorX, selectorY);
+    createArraySelector("Dificuldade", "level", spacing, [1, 2, 3], 0, selectorX, selectorY);
     selectorY = selectorY + height;
     createArraySelector("Modo de Jogo", "misere", spacing, ["normal", "misere"], 0, selectorX, selectorY);
     selectorY = selectorY + height;
@@ -206,6 +206,7 @@ function dominoPlacer(line, row) {
                 freeze = true;
                 var options = {};
                 options["level"] = level;
+                options["misere"] = misere;
                 if (firstPlayer == "Vertical") options["orientation"] = "h";
                 else if (firstPlayer == "Horizontal") options["orientation"] = "v";
                 queryGameboard(getDomineeringBoard(), "Domineering", options, setDomineeringBoard);

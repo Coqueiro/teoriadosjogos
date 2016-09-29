@@ -1,27 +1,29 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Author: Robinson Callou
-% Date: 11/05/2016
+% Date: 02/04/2016
 %
-% Nim modelo Jogador Vs IA com múltiplas dificuldades
+% Domineering modelo Jogador Vs IA com múltiplas dificuldades
 % Indicação: 2-Principiante, 3-Amador, 4-intermediario, 5-Avançado, 6-Mestre
 %
 % setBoardSize(BoardSize). - Define tamanho do tabuleiro
-% computerA. - IA joga primeiro
-% computerB. - IA joga em segundo
+% computerV. - IA joga na vertical
+% computerH. - IA joga na horizontal
 % playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2). - Movimento do Jogador (P1=(X1,Y1) e P2=(X2,Y2), P1 superior/esquerda de P2)
 % playComputer(NewBoard, Sign, Board, Level, Victory, Defeat). - Movimento da IA
 % playComputer(NewBoard, BoardSize, Sign, Board, Level, Victory, Defeat). - Movimento da IA passando tamanho do tabuleiro
 %
 % Tabuleiro inicial (exemplo)
 %
-%   1 2 3 4 5 6 
-% 1|P|-|-|-|-|-|
-% 2|P|P|-|-|-|-|
-% 3|P|P|P|-|-|-|
-% 4|P|P|P|P|-|-|
-% 5|P|P|P|P|P|-|
-% 6|P|P|P|P|P|P|
+%   1 2 3 4 5 6 7 8
+% 1| | | | | | | | |
+% 2| | | | | | | | |
+% 3| | | | | | | | |
+% 4| | | | | | | | |
+% 5| | | | | | | | |
+% 6| | | | | | | | |
+% 7| | | | | | | | |
+% 8| | | | | | | | |
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -31,12 +33,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Convenções
-turnToSign(a, a).
-turnToSign(b, b).
-enemy(a, b).
-enemy(b, a).
-nextPlayer(a, b).
-nextPlayer(b, a).
+turnToSign(v, v).
+turnToSign(h, h).
+enemy(v, h).
+enemy(h, v).
+nextPlayer(v, h).
+nextPlayer(h, v).
 
 % Guarda peças no tabuleiro
 putSign(Board, BoardSize, Line, Col, Sign, NewBoard) :-
@@ -66,7 +68,7 @@ findPiece(Board, BoardSize, S, Line, Col) :-
 % Recebe a peça correta
 getPiece(Board, BoardSize, Line, Col, P) :-
  getPos(Board, BoardSize, Line, Col, P),
- P = p.
+ (P = v ; P = h).
 
 % Recebe a posição
 getPos(Board, BoardSize, Line, Col, Sign) :-
@@ -92,36 +94,25 @@ validMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
 % Valida um movimento normal
 validStdMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
  validateMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2),
- movePiece(Board, BoardSize, e, ToL1, ToC1, ToL2, ToC2, NewBoard).
+ movePiece(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).
+ %write(L),write('/'),write(C),write('-'),write(Tl),write('/'),write(Tc),nl.
 
 % Valida um único movimento normal
-validateMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2) :-
- (Sign = a ; Sign = b),
- between(1, BoardSize, ToL1),
- between(1, ToL1, ToC1),
- findPiece(Board, BoardSize, p, ToL1, ToC1),
- EorNC is ToC1 + 1,
- (
-  EorNC > BoardSize
-  ;
-  findPiece(Board, BoardSize, n, ToL1, EorNC)
-  ;
-  findPiece(Board, BoardSize, e, ToL1, EorNC)
- ),
- (
-  ToL2 is ToL1,
-  between(1, ToC1, ToC2)
- ),
- findPiece(Board, BoardSize, p, ToL2, ToC2).
+validateMove(Board, BoardSize, v, ToL1, ToC1, ToL2, ToC2) :-
+ findPiece(Board, BoardSize, e, ToL1, ToC1),
+ ToL2 is ToL1 + 1, 
+ ToC2 is ToC1,
+ findPiece(Board, BoardSize, e, ToL2, ToC2).
+validateMove(Board, BoardSize, h, ToL1, ToC1, ToL2, ToC2) :-
+ findPiece(Board, BoardSize, e, ToL1, ToC1),
+ ToL2 is ToL1, 
+ ToC2 is ToC1 + 1,
+ findPiece(Board, BoardSize, e, ToL2, ToC2).
 
 % Realiza um movimento normal
-movePiece(Board, BoardSize, Sign, ToL2, ToC2, ToL2, ToC2, NewBoard) :-
- putSign(Board, BoardSize, ToL2, ToC2, Sign, NewBoard), !.
-
 movePiece(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
  putSign(Board, BoardSize, ToL1, ToC1, Sign, TempBoard),
- NewToC1 is ToC1 - 1,
- movePiece(TempBoard, BoardSize, Sign, ToL1, NewToC1, ToL2, ToC2, NewBoard), !.
+ putSign(TempBoard, BoardSize, ToL2, ToC2, Sign, NewBoard).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%  JOGADAS PSEUDO-ALEATÓRIAS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -158,22 +149,22 @@ setBoardSize(BoardSize) :-
  retractall(boardSize(_)),
  assert(boardSize(BoardSize)).
 
-% Jogador começa
-computerA :-
+% IA joga na vertical
+computerV :-
  retractall(min2Move(_)),retractall(max2Move(_)),
- assert(min2Move(b/_)),assert(max2Move(a/_)).
+ assert(min2Move(h/_)),assert(max2Move(v/_)).
 
-% Computador começa
-computerB :-
+% IA joga na horizontal
+computerH :-
  retractall(min2Move(_)),retractall(max2Move(_)),
- assert(min2Move(a/_)),assert(max2Move(b/_)).
+ assert(min2Move(v/_)),assert(max2Move(h/_)).
 
-% Captura o próximo movimento
+% Movimento do Jogador (P1=(X1,Y1) e P2=(X2,Y2), P1 superior/esquerda de P2)
 playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2) :-
  boardSize(BoardSize),
  move(Board, BoardSize, Sign, X1, Y1, X2, Y2, NewBoard),!.% Jogada
 
-% Movimento do Computador
+% Movimento da IA
 playComputer(NewBoard, Sign, Board, Level, Victory, Defeat) :-
  boardSize(BoardSize),
  (
@@ -189,16 +180,24 @@ playComputer(NewBoard, Sign, Board, Level, Victory, Defeat) :-
  ),!.
 
 moveComputer(NewBoard, Sign, Board, Level) :-
-% write(Board),nl,
  boardSize(BoardSize),
- (
-  callMinMax(Sign/Board, BoardSize, -1000000, 1000000, _/NewBoard, _, Level, 5),!
-  ->
-  !
-  ;
-  moveRandom(Board, BoardSize, Sign, NewestBoard),
-  NewBoard = NewestBoard
- ).
+ gameRunDown(BoardSize, Board, TurnNumber),
+ retractall(turnNumber(_)),
+ assert(turnNumber(TurnNumber)),
+ callMinMax(Sign/Board, BoardSize, -1000000, 1000000, _/NewBoard, _, Level, 10),!.
+
+gameRunDown(BoardSize, Board, TurnNumber) :-
+ Board =.. [b|ListBoard],
+ countElements(ListBoard, e, Empty),
+ TurnNumber is Empty / BoardSize.
+
+countElements([X|T], X, Y):-
+ countElements(T, X, Z),
+ Y is 1 + Z.
+countElements([X1|T], X, Z):-
+ X1 \= X,
+ countElements(T, X, Z).
+countElements([], _, 0).
  
 victoryBoard(Board, Sign, Victory) :-
  boardSize(BoardSize),
@@ -207,6 +206,9 @@ victoryBoard(Board, Sign, Victory) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%  CALCULO DA JOGADA DO COMPUTADOR  %%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MiniMax + Podagem Alpha-Beta
 % Adaptado de A. Visser, Game Playing, University of Amsterdam, 2007
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -221,12 +223,17 @@ loopAlphaBeta(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth) :-
   Depth > 0,
   moves(Pos, BoardSize, PosList),!,
   bestBound(PosList, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth)
-%  ,write(Val),write(GoodPos),nl
   ;
-  staticValuation(Pos, BoardSize, SVal),			% MinMax
-%  dinamicValuation(Pos, BoardSize, DVal, BDepth),		% Monte Carlo
-  DVal is 5,
-  Val is SVal * (DVal/BDepth),!
+  turnNumber(TurnNumber),
+  TurnNumber >= BoardSize - 3,
+  staticValuation(Pos, BoardSize, Val,_),!			% MinMax
+  ;
+  turnNumber(TurnNumber),
+  TurnNumber < BoardSize - 3,
+  TurnNumber >= 2,
+  staticValuation(Pos, BoardSize, Val),!			% MinMax
+  ;
+  dinamicValuation(Pos, BoardSize, Val, BDepth),!		% Monte Carlo
  ).								% Retorno da Posição
 
 bestBound([Pos|PosList], BoardSize, Alpha, Beta, GoodPos, GoodVal, Depth, BDepth) :-
@@ -275,11 +282,15 @@ staticValuation(Turn/Board, BoardSize, Res) :-
   Res is ResBonus
  ),!.
 
-% Bonus
-boardBonus(Sign, Board, BoardSize, Bonus) :-
- moves(Sign/Board, BoardSize, PosList),!,
- length(PosList, Res),
- Bonus is Res.
+staticValuation(Turn/Board, BoardSize, Res, _) :-
+ boardBonus(Turn, Board, BoardSize, ResBonus, _),
+ (
+  min2Move(Turn/_),
+  Res is - ResBonus
+  ;
+  max2Move(Turn/_),
+  Res is ResBonus
+ ),!.
 
 % Heurística
 dinamicValuation(Turn/Board, BoardSize, Res, BDepth) :-
@@ -313,6 +324,71 @@ playRandom(Board, BoardSize, Sign, Win, Loss) :-
   ;
   Win is 0, Loss is 1, true
  ).
+
+% Bonus
+boardBonus(Turn, Board, BoardSize, Bonus) :-
+ enemy(Turn, EnemyTurn),
+ countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, BoardSize, 0).
+
+boardBonus(Turn, Board, BoardSize, Bonus, _) :-
+ enemy(Turn, EnemyTurn),
+ countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, BoardSize, 0, _).
+
+countBonus(_, _, _, _, Bonus, 0, Bonus) :- !.
+countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, Loop, CounterBonus) :-
+ incrementalBonusBorder(Turn, Loop, Board, BoardSize, BonusBT),
+ incrementalBonusBorder(EnemyTurn, Loop, Board, BoardSize, BonusBE),
+ incrementalBonusField(Turn, Board, BoardSize, Loop, BonusFT, BoardSize, 0),
+ incrementalBonusField(EnemyTurn, Board, BoardSize, Loop, BonusFE, BoardSize, 0),
+ NewCounterBonus is 
+  CounterBonus 
+  + 2*BonusBT - BonusBE 
+  + BonusFT - BonusFE,
+ NewLoop is Loop - 1,
+ countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, NewLoop, NewCounterBonus).
+
+countBonus(_, _, _, _, Bonus, 0, Bonus, _) :- !.
+countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, Loop, CounterBonus, _) :-
+ incrementalBonusBorder(Turn, Loop, Board, BoardSize, BonusBT),
+ incrementalBonusBorder(EnemyTurn, Loop, Board, BoardSize, BonusBE),
+ NewCounterBonus is 
+  CounterBonus 
+  + 2*BonusBT - BonusBE,
+ NewLoop is Loop - 1,
+ countBonus(Turn, EnemyTurn, Board, BoardSize, Bonus, NewLoop, NewCounterBonus).
+
+incrementalBonusBorder(v, Line, Board, BoardSize, Bonus) :-
+ (
+  findPiece(Board, BoardSize, v, Line, 2), findPiece(Board, BoardSize, e, Line, 1) 
+  -> 
+  BonusA is 1 ; BonusA is 0
+ ),
+ Aux is BoardSize - 1,
+ (
+  findPiece(Board, BoardSize, v, Line, Aux), findPiece(Board, BoardSize, e, Line, BoardSize) 
+  -> 
+  BonusB is 1 ; BonusB is 0
+ ),
+ Bonus is BonusA + BonusB.
+
+incrementalBonusBorder(h, Col, Board, BoardSize, Bonus) :-
+ (
+  findPiece(Board, BoardSize, h, 2, Col), findPiece(Board, BoardSize, e, 1, Col) 
+  -> 
+  BonusA is 1 ; BonusA is 0
+ ),
+ Aux is BoardSize - 1,
+ (
+  findPiece(Board, BoardSize, h, Aux, Col), findPiece(Board, BoardSize, e, BoardSize, Col) 
+  -> 
+  BonusB is 1 ; BonusB is 0
+ ),
+ Bonus is BonusA + BonusB.
+
+incrementalBonusField(Sign, Board, BoardSize, _, Bonus, _, _) :-
+ moves(Sign/Board, BoardSize, PosList),!,
+ length(PosList, Res),
+ Bonus is Res.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  FIM DO PROGRAMA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

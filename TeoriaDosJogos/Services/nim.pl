@@ -7,9 +7,10 @@
 % Indicação: 2-Principiante, 3-Amador, 4-intermediario, 5-Avançado, 6-Mestre
 %
 % setBoardSize(BoardSize). - Define tamanho do tabuleiro
+% setPlayRule(PlayRule). - Define a regra de jogo (normal/misere)
 % computerA. - IA joga primeiro
 % computerB. - IA joga em segundo
-% playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2). - Movimento do Jogador (P1=(X1,Y1) e P2=(X2,Y2), P1 superior/esquerda de P2)
+% playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2). - Movimento do Jogador (P1=(X1,Y1) e P2=(X2,Y2), P2 esquerda de P1)
 % playComputer(NewBoard, Sign, Board, Level, Victory, Defeat). - Movimento da IA
 % playComputer(NewBoard, BoardSize, Sign, Board, Level, Victory, Defeat). - Movimento da IA passando tamanho do tabuleiro
 %
@@ -129,18 +130,6 @@ movePiece(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
 
 % Realiza o movimento das peças
 moveRandom(Board, BoardSize, Sign, NewBoard) :-
- validMoveRandom(Board, BoardSize, Sign, NewBoard).%Valida o movimento.
-moveRandom(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
- validMoveRandom(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).%Valida o movimento.
-
-% Um movimento é valido se:
-validMoveRandom(Board, BoardSize, Sign, NewBoard) :-
- validStdMoveRandom(Board, BoardSize, Sign, _, _, _, _, NewBoard).%Movimento normal.
-validMoveRandom(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
- validStdMoveRandom(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard).%Movimento normal.
-
-% Valida um movimento normal, quer-se realizar somente uma jogada.
-validStdMoveRandom(Board, BoardSize, Sign, _, _, _, _, NewBoard) :-
  moves(Sign/Board, BoardSize, PosList),!,
  random_member(_/NewBoard, PosList),!.
 
@@ -158,6 +147,11 @@ setBoardSize(BoardSize) :-
  retractall(boardSize(_)),
  assert(boardSize(BoardSize)).
 
+% Define a regra de jogo
+setPlayRule(PlayRule) :-
+ retractall(playRule(_)),
+ assert(playRule(PlayRule)).
+
 % Jogador começa
 computerA :-
  retractall(min2Move(_)),retractall(max2Move(_)),
@@ -174,22 +168,20 @@ playHuman(NewBoard, Sign, Board, X1, Y1, X2, Y2) :-
  move(Board, BoardSize, Sign, X1, Y1, X2, Y2, NewBoard),!.% Jogada
 
 % Movimento do Computador
-playComputer(NewBoard, Sign, Board, Level, Victory, Defeat) :-
+playComputer(NewBoard, Sign, Board, Level, EndGame, Victory) :-
  boardSize(BoardSize),
  (
-  validMove(Board, BoardSize, Sign, _),! 
-  -> 
-  Defeat = false,
-  moveComputer(NewBoard, Sign, Board, Level),!,
-  victoryBoard(NewBoard, Sign, Victory),!
-  ; 
-  Defeat = true,
+  validMove(Board, BoardSize, Sign, _), ! 
+  ->
+  moveComputer(NewBoard, Sign, Board, Level), !,
+  victoryBoard(NewBoard, Sign, EndGame, Victory), !
+  ;
   NewBoard = Board,
-  Victory = false
- ),!.
+  EndGame = true,
+  (playRule(misere), Victory = true ; playRule(normal), Victory = false)
+ ), !.
 
 moveComputer(NewBoard, Sign, Board, Level) :-
-% write(Board),nl,
  boardSize(BoardSize),
  (
   callMinMax(Sign/Board, BoardSize, -1000000, 1000000, _/NewBoard, _, Level, 5),!
@@ -200,10 +192,17 @@ moveComputer(NewBoard, Sign, Board, Level) :-
   NewBoard = NewestBoard
  ).
  
-victoryBoard(Board, Sign, Victory) :-
+victoryBoard(Board, Sign, EndGame, Victory) :-
  boardSize(BoardSize),
  enemy(Sign, EnemySign),
- (validMove(Board, BoardSize, EnemySign, _),! -> Victory = false ; Victory = true).
+ (
+  validMove(Board, BoardSize, EnemySign, _), !
+  ->
+  EndGame = false, Victory = false
+  ;
+  EndGame = true,
+  (playRule(misere), Victory = false ; playRule(normal), Victory = true)
+ ).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%  CALCULO DA JOGADA DO COMPUTADOR  %%%%%%%%%%%%%%%%%%%%%%
@@ -212,21 +211,19 @@ victoryBoard(Board, Sign, Victory) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 callMinMax(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth) :-
- loopAlphaBeta(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth),
-% write(Val),write(GoodPos),nl,
- !.
+ loopAlphaBeta(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth), !.
 
 loopAlphaBeta(Pos, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth) :-
  (
   Depth > 0,
   moves(Pos, BoardSize, PosList),!,
   bestBound(PosList, BoardSize, Alpha, Beta, GoodPos, Val, Depth, BDepth)
-%  ,write(Val),write(GoodPos),nl
   ;
   staticValuation(Pos, BoardSize, SVal),			% MinMax
 %  dinamicValuation(Pos, BoardSize, DVal, BDepth),		% Monte Carlo
   DVal is 5,
-  Val is SVal * (DVal/BDepth),!
+  ResVal is SVal * (DVal/BDepth), !,
+  (playRule(misere), Val is -ResVal ; playRule(normal), Val is ResVal)
  ).								% Retorno da Posição
 
 bestBound([Pos|PosList], BoardSize, Alpha, Beta, GoodPos, GoodVal, Depth, BDepth) :-
