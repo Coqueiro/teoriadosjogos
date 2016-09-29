@@ -11,7 +11,7 @@
     window.whiteColor = "yellow";
     window.level = parseInt(getParameterByName("level")) || 1;
     window.lines = parseInt(getParameterByName("lines")) || 8;
-    window.firstPlayer = getParameterByName("firstPlayer") || "Black";
+    window.firstPlayer = getParameterByName("firstPlayer") || "Azul";
     startMenuOthello();
 }
 
@@ -89,7 +89,7 @@ function renderOthelloSelectors() {
 
     createArraySelector("Dificuldade", "level", spacing, [0, 1, 2], 1, selectorX, selectorY);
     selectorY = selectorY + height;
-    createArraySelector("Linhas", "lines", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
+    createArraySelector("Tamanho", "lines", spacing, [4, 5, 6, 7, 8, 9, 10, 11, 12], 4, selectorX, selectorY);
     selectorY = selectorY + height;
     createArraySelector("Primeiro player", "firstPlayer", spacing, ["Azul", "Amarelo"], 0, selectorX, selectorY);
 }
@@ -99,7 +99,7 @@ function initGameOthello() {
     Crafty.trigger("DestroySelector");
     othelloBoardGenerator(lines);
     othelloBoardRender();
-    if (firstPlayer == "White") {
+    if (firstPlayer == "Amarelo") {
         freeze = true;
         var options = {};
         options["level"] = level;
