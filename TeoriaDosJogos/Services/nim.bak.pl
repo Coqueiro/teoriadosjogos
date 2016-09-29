@@ -3,7 +3,7 @@
 % Author: Robinson Callou
 % Date: 11/05/2016
 %
-% Nim modelo Jogador Vs IA com múltiplas dificuldades
+% Nim2D modelo Jogador Vs IA com múltiplas dificuldades
 % Indicação: 2-Principiante, 3-Amador, 4-intermediario, 5-Avançado, 6-Mestre
 %
 % setBoardSize(BoardSize). - Define tamanho do tabuleiro
@@ -93,6 +93,7 @@ validMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
 validStdMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
  validateMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2),
  movePiece(Board, BoardSize, e, ToL1, ToC1, ToL2, ToC2, NewBoard).
+ %write(L),write('/'),write(C),write('-'),write(Tl),write('/'),write(Tc),nl.
 
 % Valida um único movimento normal
 validateMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2) :-
@@ -100,28 +101,19 @@ validateMove(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2) :-
  between(1, BoardSize, ToL1),
  between(1, ToL1, ToC1),
  findPiece(Board, BoardSize, p, ToL1, ToC1),
- EorNC is ToC1 + 1,
  (
-  EorNC > BoardSize
+  between(1, ToL1, ToL2),
+  ToC2 is ToC1
   ;
-  findPiece(Board, BoardSize, n, ToL1, EorNC)
-  ;
-  findPiece(Board, BoardSize, e, ToL1, EorNC)
- ),
- (
   ToL2 is ToL1,
   between(1, ToC1, ToC2)
  ),
- findPiece(Board, BoardSize, p, ToL2, ToC2).
+ findPiece(Board, BoardSize, p, ToL2, ToC2). %cut here somehow...
 
 % Realiza um movimento normal
-movePiece(Board, BoardSize, Sign, ToL2, ToC2, ToL2, ToC2, NewBoard) :-
- putSign(Board, BoardSize, ToL2, ToC2, Sign, NewBoard), !.
-
 movePiece(Board, BoardSize, Sign, ToL1, ToC1, ToL2, ToC2, NewBoard) :-
  putSign(Board, BoardSize, ToL1, ToC1, Sign, TempBoard),
- NewToC1 is ToC1 - 1,
- movePiece(TempBoard, BoardSize, Sign, ToL1, NewToC1, ToL2, ToC2, NewBoard), !.
+ putSign(TempBoard, BoardSize, ToL2, ToC2, Sign, NewBoard).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%  JOGADAS PSEUDO-ALEATÓRIAS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -155,17 +147,14 @@ moves(Turn/Board, BoardSize, [B|Bs]) :-
 
 % Define tamanho do tabuleiro
 setBoardSize(BoardSize) :-
- retractall(boardSize(_)),
  assert(boardSize(BoardSize)).
 
 % Jogador começa
 computerA :-
- retractall(min2Move(_)),retractall(max2Move(_)),
  assert(min2Move(b/_)),assert(max2Move(a/_)).
 
 % Computador começa
 computerB :-
- retractall(min2Move(_)),retractall(max2Move(_)),
  assert(min2Move(a/_)),assert(max2Move(b/_)).
 
 % Captura o próximo movimento
